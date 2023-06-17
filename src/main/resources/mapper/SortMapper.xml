@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zyq.bloggy.mapper.SortMapper">
+    <resultMap id="baseSortMap" type="com.zyq.bloggy.pojo.Sort">
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="owner" column="owner"/>
+        <result property="cover" column="cover"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <collection property="articles" ofType="com.zyq.bloggy.pojo.Article">
+            <id property="id" column="article_id"/>
+            <result property="title" column="article_title"/>
+            <result property="views" column="views"/>
+            <result property="likeNum" column="like_num"/>
+            <result property="createTime" column="article_create_time"/>
+        </collection>
+    </resultMap>
+    <insert id="addArticleToSort">
+        insert into tb_article_of_sort(sort_id, article_id)
+        SELECT #{sortId},
+               #{articleId}
+        where exists(select id from tb_sort where id = #{sortId})
+          and exists(select id from tb_article where id = #{articleId})
+    </insert>
+    <delete id="delArticleFromSort">
+        delete
+        from tb_article_of_sort
+        where sort_id = #{sortId}
+          and article_id = #{articleId}
+    </delete>
+    <delete id="delArticlesFromSort">
+        delete from tb_article_of_sort where sort_id=#{sortId} and article_id in
+        <foreach collection="articleIds" item="id" open="(" close=")" separator=",">
+            id
+        </foreach>
+    </delete>
+    <delete id="delById">
+        update tb_sort
+        set status=0
+        where id = #{id}
+          and owner = #{userId}
+    </delete>
+    <select id="getDetailById" resultMap="baseSortMap">
+        select ts.id,
+               ts.title,
+               ts.owner,
+               ts.cover,
+               ts.status,
+               ts.create_time,
+               ts.create_time,
+               ta.id          as article_id,
+               ta.title       as article_title,
+               ta.views,
+               ta.like_num,
+               ta.create_time as article_create_time
+        from tb_article_of_sort taos
+                 inner join tb_article ta on taos.article_id = ta.id
+                 inner join tb_sort ts on taos.sort_id = ts.id
+    </select>
+</mapper>

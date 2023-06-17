@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zyq.bloggy.mapper.UserMapper">
+    <resultMap id="UserStateMap" type="com.zyq.bloggy.vo.UserStateVo">
+        <result property="beLikeCount" column="be_like_count"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="articleCount" column="article_count"/>
+        <result property="sortCount" column="sort_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="commentCount" column="comment_count"/>
+    </resultMap>
+    <select id="getUserStateById" resultMap="UserStateMap">
+        select ifnull(sum(ta.like_num) + sum(tac.like_num) + sum(trc.like_num), 0)    as be_like_count,
+               ifnull(sum(ta.views), 0)                                               as view_count,
+               ifnull(count(ta.id), 0)                                                as article_count,
+               ifnull(count(ts.id), 0)                                                as sort_count,
+               ifnull(count(tacl.user_id) + count(trcl.user_id), 0)                   as like_count,
+               ifnull(count(tac.article_comment_id) + count(trc.reply_comment_id), 0) as comment_count
+        from tb_article ta
+                 join tb_user tu on ta.author = tu.id
+                 join tb_article_comment tac on tac.user_id = tu.id
+                 join tb_reply_comment trc on trc.user_id = tu.id
+                 join tb_sort ts on ts.owner = tu.id
+                 join tb_article_comment_like tacl on tacl.user_id = tu.id
+                 join tb_reply_comment_like trcl on trcl.user_id = tu.id
+        where tu.id = #{id};
+    </select>
+</mapper>

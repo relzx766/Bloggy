@@ -1,0 +1,80 @@
+server:
+  port: 8080
+spring:
+  servlet:
+    multipart:
+      max-request-size: 5GB  # 上传文件总的最大值 默认10MB
+      max-file-size: 1GB #单个文件最大值 默认10MB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blogy-dev?userUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: root
+    druid:
+      initial-size: 2
+      max-active: 8
+      min-idle: 1
+      max-wait: 6000
+      stat-view-servlet:
+        enabled: true
+        login-username: zyq
+        login-password: 123
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
+  data:
+    redis:
+      database: 0
+      host: localhost
+      port: 6379
+      password:
+      timeout: 6000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1
+  web:
+    resources:
+      static-locations: file:D:\\project\\Bloggy\\static
+  mail:
+    protocol: smtp
+    host: smtp.qq.com
+    port: 465
+    username: 2984109304@qq.com
+    password: yiutxcqcienhdegi
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          timeout: 10000
+          localhost: LAPTOP-8N2VLVPS
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            enable: false
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+    freemarker:
+      cache: false
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:mapper/*Mapper.xml
+  global-config:
+    db-config:
+      logic-delete-value: 0
+      logic-not-delete-value: 1
+sa-token:
+  is-log: true
+
