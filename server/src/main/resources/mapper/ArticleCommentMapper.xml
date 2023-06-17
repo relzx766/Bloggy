@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zyq.bloggy.mapper.ArticleCommentMapper">
+    <resultMap id="baseCommentMap" type="com.zyq.bloggy.vo.CommentVo">
+        <id property="commentId" column="comment_id"/>
+        <result property="content" column="content"/>
+        <result property="likeNum" column="like_num"/>
+        <result property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="nickname" column="nickname"/>
+        <result property="avatar" column="avatar"/>
+        <result property="replyId" column="reply_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+    <insert id="addComment">
+        insert into tb_article_comment(article_comment_id, article_id, user_id, content, like_num, create_time, status)
+        SELECT #{id},
+               #{articleId},
+               #{userId},
+               #{content},
+               #{likeNum},
+               #{createTime},
+               #{status}
+        where exists(select id from tb_article where id = #{articleId})
+          and exists(select id from tb_user where id = #{userId})
+    </insert>
+    <delete id="delByCommentId">
+        start transaction;
+        delete
+        from tb_article_comment
+        where article_comment_id = #{id};
+        delete
+        from tb_reply_comment
+        where comment_id = #{id};
+        commit;
+    </delete>
+    <delete id="delByIds">
+        start transaction ;
+        delete from tb_article_comment where article_comment_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        delete from tb_reply_comment where comment_id in <foreach collection="ids" item="id" separator="," open="("
+                                                                  close=")">
+        #{id}
+    </foreach>;
+    </delete>
+    <select id="getCommentByArticleId" resultMap="baseCommentMap">
+        select tac.article_comment_id as comment_id,
+               tac.content,
+               tac.like_num,
+               tac.create_time,
+               tu.id                  as user_id,
+               tu.username,
+               tu.nickname,
+               tu.avatar
+        from tb_article_comment tac
+                 join tb_user tu on tac.user_id = tu.id
+        where tac.article_id = #{id}
+    </select>
+    <select id="getCommentByArticleIdLimited" resultMap="baseCommentMap">
+        select tac.article_comment_id as comment_id,
+               tac.content,
+               tac.like_num,
+               tac.create_time,
+               tu.id                  as user_id,
+               tu.username,
+               tu.nickname,
+               tu.avatar
+        from tb_article_comment tac
+                 join tb_user tu on tac.user_id = tu.id
+        where tac.article_id = #{id}
+        limit #{current},#{size}
+    </select>
+</mapper>

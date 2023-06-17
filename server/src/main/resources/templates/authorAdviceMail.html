@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>通知</title>
+</head>
+<body>
+<div class="content">
+    <div class="content-text">
+        <p>亲爱的用户:<span th:text="${account}"></span></p>
+        <p>您的作品
+            <span style="font-weight: bolder" th:text="${id}"></span>
+            <span>:</span>
+            <span th:text="${title}"></span>
+        </p>
+        <p>由于</p>
+        <p th:text="${reason}"></p>
+        <p>被管理员删除，详情请联系管理员</p>
+        <a href="http://localhost:8080/default/sweet.jpg">点此申述</a>
+    </div>
+</div>
+</body>
+</html>

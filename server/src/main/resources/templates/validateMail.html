@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>验证码</title>
+</head>
+<body>
+<div class="content">
+    <div class="content-text">
+        <p>亲爱的用户，</p>
+        <p>欢迎注册Bloggy，您的验证码为</p>
+        <h2 style="color: coral" th:text="${code}"></h2>
+        <p>该验证码20分钟内有效，请勿泄露他人</p>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zyq.bloggy.mapper.ReplyCommentMapper">
+
+    <insert id="addComment">
+        insert into tb_reply_comment(reply_comment_id, comment_id, type, content, user_id, like_num, status,
+                                     create_time)
+        SELECT #{id},
+               #{commentId},
+               #{type},
+               #{content},
+               #{userId},
+               #{likeNum},
+               #{status},
+               #{createTime}
+        where exists(select article_comment_id from tb_article_comment where article_comment_id = #{commentId})
+          and exists(select id from tb_user where id = #{userId})
+    </insert>
+    <select id="getByArtCommentId" resultMap="com.zyq.bloggy.mapper.ArticleCommentMapper.baseCommentMap">
+        select trc.reply_comment_id as reply_id,
+               trc.content,
+               trc.like_num,
+               trc.create_time,
+               tu.id                as user_id,
+               tu.username,
+               tu.nickname,
+               tu.avatar,
+               trc.comment_id
+        from tb_reply_comment trc
+                 join tb_user tu on trc.user_id = tu.id
+                 join tb_article_comment tac on tac.article_comment_id = trc.comment_id
+        where trc.comment_id = #{id}
+    </select>
+    <select id="getByCommentIdLimited" resultMap="com.zyq.bloggy.mapper.ArticleCommentMapper.baseCommentMap">
+        select trc.reply_comment_id as reply_id,
+               trc.content,
+               trc.like_num,
+               trc.create_time,
+               tu.id                as user_id,
+               tu.username,
+               tu.nickname,
+               tu.avatar,
+               trc.comment_id
+        from tb_reply_comment trc
+                 join tb_user tu on trc.user_id = tu.id
+                 join tb_article_comment tac on tac.article_comment_id = trc.comment_id
+        where trc.comment_id = #{id}
+    </select>
+</mapper>
