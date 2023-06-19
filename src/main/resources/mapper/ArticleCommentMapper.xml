@@ -11,6 +11,7 @@
         <result property="avatar" column="avatar"/>
         <result property="replyId" column="reply_id"/>
         <result property="createTime" column="create_time"/>
+        <result property="isLike" column="is_like"/>
     </resultMap>
     <insert id="addComment">
         insert into tb_article_comment(article_comment_id, article_id, user_id, content, like_num, create_time, status)
@@ -24,6 +25,38 @@
         where exists(select id from tb_article where id = #{articleId})
           and exists(select id from tb_user where id = #{userId})
     </insert>
+    <insert id="addLike">
+        <!--        insert into tb_article_comment_like(user_id, comment_id, create_time)
+                select temp.fromId, temp.toId, temp.createTime
+                from (
+                <foreach collection="thumbs" item="item" separator="union">
+                    select #{item.fromId},#{item.toId},#{item.createTime}
+                    where exists(select id from tb_user where id=#{item.fromId})
+                    and exists(select article_comment_id from tb_article_comment where article_comment_id=#{item.toId})
+                </foreach>
+                ) as temp
+                where temp.fromId not in (select user_id from tb_article_comment_like)
+                and temp.toId not in (select comment_id from tb_article_comment_like)-->
+        insert into tb_article_comment_like(user_id, comment_id, create_time)
+        select
+        temp2.fromId, toId, create_time
+        from
+        (select temp.fromId,temp.toId,temp.create_time
+        from(
+        <foreach collection="thumbs" item="item" separator="union">
+            select #{item.fromId} as fromId,#{item.toId} as toId,#{item.createTime} as create_time
+        </foreach>
+        )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_article_comment as tac on
+        tac.article_comment_id=temp.toId
+        where tu.id is not null and tac.article_comment_id is not null)as temp2
+        left join tb_article_comment_like tacl on tacl.user_id=temp2.fromId and tacl.comment_id=temp2.toId where
+        tacl.user_id is null
+    </insert>
+    <update id="updateLikeNumInt">
+        update tb_article_comment
+        set like_num=like_num + #{num}
+        where article_comment_id = #{id}
+    </update>
     <delete id="delByCommentId">
         start transaction;
         delete
@@ -44,6 +77,14 @@
                                                                   close=")">
         #{id}
     </foreach>;
+    </delete>
+    <delete id="delLike">
+        delete from tb_article_comment_like where comment_id in (
+        select temp.comment_id from(
+        <foreach collection="thumbs" item="item" separator="union">
+            select comment_id from tb_article_comment_like where comment_id=#{item.toId} and user_id=#{item.fromId}
+        </foreach>)temp
+        )
     </delete>
     <select id="getCommentByArticleId" resultMap="baseCommentMap">
         select tac.article_comment_id as comment_id,
@@ -71,5 +112,11 @@
                  join tb_user tu on tac.user_id = tu.id
         where tac.article_id = #{id}
         limit #{current},#{size}
+    </select>
+    <select id="getIsLike" resultType="java.lang.Integer">
+        select count(*)
+        from tb_article_comment_like
+        where comment_id = #{commentId}
+          and user_id = #{userId}
     </select>
 </mapper>

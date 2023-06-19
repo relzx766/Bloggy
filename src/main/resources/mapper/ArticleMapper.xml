@@ -38,12 +38,20 @@
         where exists(select #{art.author} from tb_user where id = #{art.author})
     </insert>
     <insert id="addLike">
-        insert into tb_like_article(user_id, article_id, like_time)
+        insert into tb_like_article(user_id,article_id,like_time)
+        select
+        temp2.fromId, toId, create_time
+        from
+        (select temp.fromId,temp.toId,temp.create_time
+        from(
         <foreach collection="thumbs" item="item" separator="union">
-            select #{item.fromId},#{item.toId},#{item.createTime}
-            where exists(select id from tb_user where id=#{item.fromId})
-            and exists(select id from tb_article where id=#{item.toId})
+            select #{item.fromId} as fromId,#{item.toId} as toId,#{item.createTime} as create_time
         </foreach>
+        )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_article as ta on
+        ta.id=temp.toId
+        where tu.id is not null and ta.id is not null)as temp2
+        left join tb_like_article tla on tla.user_id=temp2.fromId and tla.article_id=temp2.toId where
+        tla.user_id is null
     </insert>
     <update id="updateLikeNum">
         update tb_article
