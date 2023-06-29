@@ -22,3 +22,11 @@ export const getDate=(date)=>{
     }
     return result;
 }
+export const getMonthAndDay=(timestamp)=>{
+    let date = new Date(timestamp);
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    month = month.toString().padStart(2, '0');
+    day = day.toString().padStart(2, '0');
+    return month + '/' + day;
+}

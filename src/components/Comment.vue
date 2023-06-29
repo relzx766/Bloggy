@@ -1,15 +1,15 @@
 <template>
   <el-container>
     <el-header style="margin-bottom: 40px;height: auto" id="header">
-<div>
-        <el-row >
+      <div>
+        <el-row style="width: 100%;">
           <el-col :span="2" style="text-align: left">
             <el-image
                 style="width: 66px; height: 66px;border-radius: 50%"
                 :src="avatar"
                 :fit="'cover'"></el-image>
           </el-col>
-          <cl-col :span="10">
+          <el-col :span="17" >
             <el-input
                 style="width: 700px;float: left;margin-top: 6px"
                 type="textarea"
@@ -17,19 +17,19 @@
                 :placeholder="comment.tempContent"
                 v-model="comment.content">
             </el-input>
-          </cl-col>
+          </el-col>
           <el-col :span="4">
             <el-button style="height: 50px;margin-top: 6px" type="primary" round @click="postComment">发布</el-button>
           </el-col>
         </el-row>
-</div>
+      </div>
       <el-divider/>
     </el-header>
     <el-main>
       <div class="comments" v-for="(item,index) in comments">
         <el-row>
           <el-col :span="2">
-            <el-image style="border-radius: 50%;width: 60px;height: 60px;float: left" :src=item.avatar>
+            <el-image :fit="'cover'" style="border-radius: 50%;width: 60px;height: 60px;float: left" :src=item.avatar>
               <div slot="placeholder" class="image-slot">
                 加载中<span class="dot">...</span>
               </div>
@@ -37,7 +37,8 @@
           </el-col>
           <el-col :span="6" style="float: left;margin-left: -10px">
             <div style="margin-top: 10px;font-weight: bold;text-align: left">{{ item.nickname }}
-              <el-tag type="danger" size="mini" v-if="item.userId==author">作者</el-tag>
+              <el-tag  v-if="item.userId===userId" size="mini">自己</el-tag>
+              <el-tag type="danger" v-else-if="item.userId===author" size="mini">作者</el-tag>
             </div>
             <div style="font-weight: lighter;font-size: 14px;text-align: left">@{{ item.username }}</div>
           </el-col>
@@ -52,7 +53,7 @@
             <el-col :span="4">{{ getDate(item.createTime) }}</el-col>
             <el-col :span="6">
               <el-row>
-                <el-col :class="{'el-icon-like':!item.isLike,'el-icon-liked':item.isLike}"
+                <el-col @click.native="likeComment(index)" :class="{'el-icon-like':!item.isLike,'el-icon-liked':item.isLike}"
                         style="width: 14px;height: 14px"></el-col>
 
                 <span>{{ item.likeNum }}</span></el-row>
@@ -60,10 +61,13 @@
           </el-row>
           <el-row>
             <div class="reply" v-for="(i,k) in getReplyByPage(replyPage,5,item.reply)">
-              <div style="width: 90%"><el-divider></el-divider></div>
+              <div style="width: 90%">
+
+                <el-divider></el-divider>
+              </div>
               <el-row>
                 <el-col :span="1">
-                  <el-image style="border-radius: 50%;width: 40px;height: 40px;float: left" :src=i.avatar>
+                  <el-image :fit="'cover'" style="border-radius: 50%;width: 40px;height: 40px;float: left" :src=i.avatar>
                     <div slot="placeholder" class="image-slot">
                       加载中<span class="dot">...</span>
                     </div>
@@ -71,7 +75,8 @@
                 </el-col>
                 <el-col :span="4" style="float: left;margin-left: 10px">
                   <div style="margin-top: 4px;font-weight: bold;text-align: left;font-size: 14px">{{ i.nickname }}
-                    <el-tag type="danger" v-if="item.userId==author" size="mini">作者</el-tag>
+                    <el-tag v-if="i.userId===userId" size="mini">自己</el-tag>
+                    <el-tag type="danger"  v-else-if="i.userId===author" size="mini">作者</el-tag>
                   </div>
                   <div style="font-weight: lighter;font-size: 12px;text-align: left">@{{ i.username }}</div>
                 </el-col>
@@ -85,7 +90,7 @@
                     <el-col :span="6">{{ getDate(i.createTime) }}</el-col>
                     <el-col :span="6">
                       <el-row>
-                        <el-col :class="{'el-icon-like':!i.isLike,'el-icon-liked':i.isLike}"
+                        <el-col @click.native="likeReply(index,k)" :class="{'el-icon-like':!i.isLike,'el-icon-liked':i.isLike}"
                                 style="width: 14px;height: 14px"></el-col>
                         <span>{{ i.likeNum }}</span></el-row>
                     </el-col>
@@ -107,8 +112,10 @@
         </div>
         <el-divider></el-divider>
       </div>
-      <div v-if ='isEnd'>已经到底了</div>
-      <div v-if="isLoading"><vue-simple-spinner ></vue-simple-spinner></div>
+      <div v-if='isEnd'>已经到底了</div>
+      <div v-if="isLoading">
+        <i class="el-icon-loading"/>
+      </div>
     </el-main>
     <el-footer style="position: fixed;bottom: 0px;width: 74%;opacity: 1;margin: 0 auto;background-color:#ffffff;
 height: 70px" v-if="commentArea">
@@ -120,7 +127,7 @@ height: 70px" v-if="commentArea">
                 :src="avatar"
                 :fit="'cover'"></el-image>
           </el-col>
-          <cl-col :span="10">
+          <el-col :span="17">
             <el-input
                 style="width: 700px;float: left;margin-top: 6px"
                 type="textarea"
@@ -128,7 +135,7 @@ height: 70px" v-if="commentArea">
                 :placeholder="comment.tempContent"
                 v-model="comment.content">
             </el-input>
-          </cl-col>
+          </el-col>
           <el-col :span="4">
             <el-button style="height: 50px;margin-top: 6px" type="primary" round @click="postComment">发布</el-button>
           </el-col>
@@ -142,33 +149,46 @@ height: 70px" v-if="commentArea">
 import Spinner from 'vue-simple-spinner'
 import {getDate} from "@/util/tools";
 import Unfold from "@/components/Unfold";
-import {getComment, getReply,postComment,postReply} from "@/api";
+import {
+  getComment,
+  getReply,
+  postComment,
+  postReply,
+  likeComment,
+  likeReply,
+  cancelLikeComment,
+  cancelLikeReply,
+  getIsLikeComment,
+  getIsLikeReply
+} from "@/api/Comment";
 import Vue from "vue";
+
 export default {
   name: "Comment",
   components: {Unfold},
   props: {
     id: Number,
     author: Number,
-    type:Number
+    type: Number
   },
   data() {
     return {
+      userId:'',
       comments: [],
       avatar: '',
       comment: {
         id: Number,
         content: '',
-        type:0,
-        tempContent:'给作者一个回复吧！'
+        type: 0,
+        tempContent: '给作者一个回复吧！'
       },
-      index:Number,
-      page:1,
-      isEnd:false,
-      total:0,
-      isLoading:false,
-      commentArea:true,
-      replyPage:1
+      index: Number,
+      page: 1,
+      isEnd: false,
+      total: 0,
+      isLoading: false,
+      commentArea: true,
+      replyPage: 1
     }
   },
   methods: {
@@ -177,74 +197,78 @@ export default {
     },
     async getComment() {
       try {
-        let res = await getComment(this.id,this.page);
-        this.total=res.data.comment.total;
+        let res = await getComment(this.id, this.page);
+        this.total = res.data.comment.total;
         let comments = res.data.comment.records;
         for (let i = 0; i < comments.length; i++) {
-          let reply = await getReply(comments[i].commentId);
-          comments[i].reply = reply.data.reply;
+          //定义一个延时函数，返回一个Promise对象
+          let delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+          await delay(20);
+          let reply = (await getReply(comments[i].commentId)).data.reply;
+          comments[i].reply = reply
         }
         this.comments.push(...comments);
+        this.isLoading=false
         console.log(this.comments.length)
       } catch (err) {
         console.error(err);
       }
     },
-  loadComment(){
-    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
-    const clientHeight = document.documentElement.clientHeight
-    const scrollHeight = document.documentElement.scrollHeight
-    if (scrollTop + clientHeight >= scrollHeight) {
-      if (this.comments.length>=this.total) {
-        console.log(this.comments.length)
-        this.isLoading=true
-        setTimeout(() => {
-          this.isLoading=false;
-          this.isEnd=true
-        }, 2000);
-      } else {
-        this.isLoading=true
-        this.page++
-        this.getComment()
-        this.isLoading=false
+    loadComment() {
+      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+      const clientHeight = document.documentElement.clientHeight
+      const scrollHeight = document.documentElement.scrollHeight
+      if (scrollTop + clientHeight >= scrollHeight) {
+        if (this.comments.length >= this.total) {
+          console.log(this.comments.length)
+          this.isLoading = true
+          setTimeout(() => {
+            this.isLoading = false;
+            this.isEnd = true
+          }, 2000);
+        } else {
+          this.isLoading = true
+          this.page++
+          this.getComment()
+        }
       }
     }
-  }
+    ,
+    async updateReply(index) {
+      let reply = await getReply(this.comments[index].commentId);
+      this.comments[index].reply = reply.data.reply;
+    }
+
   ,
-   async getReply(id) {
-      return  getReply(id)
-    },
- async updateReply(index){
-    let reply = await getReply(this.comments[index].commentId);
-    this.comments[index].reply = reply.data.reply;
-  }
-  ,
-    postComment(){
+    postComment() {
       let http;
-      if (this.comment.type===0){
-        http=postComment(this.id,this.comment.content);
-      }else{
+      if (this.comment.type === 0) {
+        http = postComment(this.id, this.comment.content);
+      } else {
         //如果type为2即为三级评论，此时将tempContent插入content头部
-        if (this.comment.type===2){
-          this.comment.content=this.comment.tempContent+this.comment.content
+        if (this.comment.type === 2) {
+          this.comment.content = this.comment.tempContent + this.comment.content
         }
-        http=postReply(this.comment.id,this.comment.content);
+        http = postReply(this.comment.id, this.comment.content);
       }
-      http.then((res)=>{
+      http.then((res) => {
         if (res.code == 2001) {
-          if (this.comment.type===0){
-          let c=res.data.comment;
-            c.username=this.$cookie.get("username");
-            c.nickname=this.$cookie.get("nickname");
-            c.avatar=this.$cookie.get("avatar");
-            this.comments.unshift(c);
-          }else {
+          if (this.comment.type === 0) {
+            let c = res.data.comment;
+            //必须要初始化reply,不如会报各种错误
+            c.reply=[]
+            c.username = this.$cookie.get("username");
+            c.nickname = this.$cookie.get("nickname");
+            c.avatar = this.$cookie.get("avatar");
+            this.comments.unshift(c)
+          } else {
             this.updateReply(this.index)
           }
-          this.comment.type=0
-          this.comment.content=''
-          this.comment.id=Number
-          this.comment.tempContent='给作者一个回复吧！'
+          this.comment.type = 0
+          this.comment.content = ''
+          this.comment.id = Number
+          this.comment.tempContent = '给作者一个回复吧！'
+          console.log(this.comment)
           this.$notify({
             title: "Bloggy",
             message: res.message,
@@ -261,47 +285,74 @@ export default {
         }
       })
     },
-    changeStatus(type,temp,index){
-      this.comment.id=this.comments[index].commentId
-      this.comment.type=type;
-      this.comment.tempContent=temp;
-      this.index=index
-      console.log(this.comment,index)
+    changeStatus(type, temp, index) {
+      this.comment.id = this.comments[index].commentId
+      this.comment.type = type;
+      this.comment.tempContent = temp;
+      this.index = index
+      console.log(this.comment, index)
     },
-    handleScroll () {
+    handleScroll() {
       // 获取目标元素
       let target = document.getElementById('header');
       let rect = target.getBoundingClientRect();
       let windowHeight = window.innerHeight || document.documentElement.clientHeight;
       if (rect.top >= 0 && rect.top <= windowHeight) {
-        this.commentArea=false
-      }else {
-        if ((rect.top-windowHeight)>=0) {
+        this.commentArea = false
+      } else {
+        if ((rect.top - windowHeight) >= 0) {
           this.commentArea = false
-        }else {
+        } else {
           this.commentArea = true
         }
       }
     },
-    handleCurrentChange (val) {
+    handleCurrentChange(val) {
       this.replyPage = val; // 更新当前回复页码
     },
-    getReplyByPage (page, size,reply) {
+    getReplyByPage(page, size, reply) {
+      console.log(reply)
       let start = (page - 1) * size;
       let end = page * size;
-      return reply.slice(start, end);
+        return reply.slice(start, end)
+    },
+    likeComment(index){
+      console.log("评论id")
+      console.log(this.comments[index].commentId)
+      if (this.comments[index].isLike){
+        this.comments[index].isLike=false
+        this.comments[index].likeNum--
+        cancelLikeComment(this.comments[index].commentId)
+      }else {
+        this.comments[index].isLike=true
+        this.comments[index].likeNum++
+        likeComment(this.comments[index].commentId)
+      }
+    }
+    ,
+    likeReply(i,j){
+      if (this.comments[i].reply[j].isLike){
+        this.comments[i].reply[j].isLike=false;
+        this.comments[i].reply[j].likeNum--
+        cancelLikeReply(this.comments[i].reply[j].replyId)
+      }else {
+        this.comments[i].reply[j].isLike=true
+        this.comments[i].reply[j].likeNum++
+        likeReply(this.comments[i].reply[j].replyId)
+      }
     }
   },
   created() {
     this.avatar = this.$cookie.get("avatar")
+    this.userId=this.$cookie.get("id")
     this.getComment();
   },
-  mounted () {
+  mounted() {
     // 事件监听
     window.addEventListener('scroll', this.loadComment);
     window.addEventListener('scroll', this.handleScroll);
   },
-  destroyed () {
+  destroyed() {
     // 离开页面取消监听
     window.removeEventListener('scroll', this.loadComment, false);
     window.removeEventListener('scroll', this.handleScroll, false);

@@ -46,12 +46,15 @@
 
 <script>
 import Navigation from "@/components/Navigation";
-import {postArticle,uploadFile} from "@/api";
+import {getArticleDetail, postArticle,update} from "@/api/Article";
+import {uploadFile} from "@/api/Common";
 
 export default {
   name: "Write",
+
   data() {
     return {
+      id:String,
       inputVisible: false,
       inputValue: '',
       article: {
@@ -89,27 +92,51 @@ export default {
     },
     postArticle(){
       this.article.content=this.$refs.md.d_value
-      this.article.tags=this.tags.join()
+      this.article.tags=this.tags
       console.log(this.article)
-      postArticle(JSON.stringify(this.article)).then((res)=>{
-        if (res.code==2001) {
-          this.$notify({
-            title: "Bloggy",
-            message: res.message,
-            type: "success",
-            duration: 2000
-          })
-          this.flag=1
-          this.$router.push("/index")
-        }else {
-          this.$notify({
-            title: "Bloggy",
-            message: res.message,
-            type: "error",
-            duration: 1000
-          })
-        }
-      })
+      if (this.id){
+        this.article.id=this.id
+        update(JSON.stringify(this.article)).then((res)=>{
+          if (res.code==2001) {
+            this.$notify({
+              title: "Bloggy",
+              message: res.message,
+              type: "success",
+              duration: 2000
+            })
+            this.flag=1
+            this.$router.push("/index")
+          }else {
+            this.$notify({
+              title: "Bloggy",
+              message: res.message,
+              type: "error",
+              duration: 1000
+            })
+          }
+        })
+      }else {
+        postArticle(JSON.stringify(this.article)).then((res)=>{
+          if (res.code==2001) {
+            this.$notify({
+              title: "Bloggy",
+              message: res.message,
+              type: "success",
+              duration: 2000
+            })
+            this.flag=1
+            this.$router.push("/index")
+          }else {
+            this.$notify({
+              title: "Bloggy",
+              message: res.message,
+              type: "error",
+              duration: 1000
+            })
+          }
+        })
+
+      }
     },
     imgAdd (pos, file) {
 // 上传图片
@@ -125,6 +152,13 @@ export default {
          */
         this.$refs.md.$img2Url(pos, 'http://' + res.data.path)
       })
+    },
+    getDetail() {
+      getArticleDetail(this.id).then((res) => {
+        this.article = res.data.article
+        this.tags= res.data.article.tags
+        this.editor.value=this.article.content
+      })
     }
   },
   components: {
@@ -139,6 +173,10 @@ export default {
     }
   },
   created() {
+    this.id=this.$route.query.id
+    if (this.id){
+      this.getDetail()
+    }
     this.editor.value=this.$cookie.get("draft")
   }
 }

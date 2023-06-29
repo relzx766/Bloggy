@@ -9,7 +9,7 @@
           <el-card class="info-card">
             <ul>
               <li>
-                <el-image style="border-radius: 50%;width: 100px;height: 100px" :src="article.userVo.avatar">
+                <el-image :fit="'cover'" style="border-radius: 50%;width: 100px;height: 100px" :src="article.userVo.avatar">
                   <div slot="placeholder" class="image-slot">
                     加载中<span class="dot">...</span>
                   </div>
@@ -27,10 +27,10 @@
             </el-button>
           </el-card>
         </div>
-        <div id="title" style="height: 40px">
-          <h1 style="font-size: 36px">{{ article.title }}</h1>
+        <div id="title" style="margin-bottom: 8px;text-align: center">
+          <h1 style="font-size: 28px">{{ article.title }}</h1>
         </div>
-        <div id="article-info" style="font-size: 10px;font-weight: lighter;height: 14px;margin-top: 6px">
+        <div id="article-info" style="font-size: 10px;font-weight: lighter;height: 14px;margin-top: 6px;text-align: center">
           <span>{{ article.views }}阅读</span>
           <span>{{ article.comments }}评论</span>
           <span>{{ article.likeNum }}喜欢</span>
@@ -51,8 +51,8 @@
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <el-row>
-          <el-col :span="5" style="margin-top: 10px"><span>最后编辑于:{{ time }}</span></el-col>
-              <el-col :span="18" style="text-align: right;">
+          <el-col :span="8" style="margin-top: 10px"><span>最后编辑于:{{ time }}</span></el-col>
+              <el-col :span="16" style="text-align: right;">
                 <el-button circle @click="like">
                 <i :class="{'el-icon-like':!article.isLike,'el-icon-liked':article.isLike}"></i>
               </el-button>
@@ -67,9 +67,9 @@
                 </el-button></el-col>
               </el-row>
           </div>
-          <el-tag v-for="tag in article.tags"
-          >{{ tag }}
-          </el-tag>
+
+        <el-link  v-for="tag in article.tags" @click.native="searchByTag(tag)"><el-tag>{{ tag }}
+        </el-tag></el-link>
         </el-card>
       </div>
       <el-card class="box-card" style="width: 80%;margin: 0 auto;">
@@ -85,18 +85,18 @@
 </template>
 
 <script>
-import {getArticleDetail, getArticleIsLike, likeArticle, cancelLikeArticle, postComment, postReply} from "@/api";
+import {getArticleDetail, likeArticle, cancelLikeArticle} from "@/api/Article";
 import {marked} from "marked"
 import Navigation from "@/components/Navigation";
 import Unfold from "@/components/Unfold";
-import {getDate} from "@/util/tools";
+import {getDate,getCount} from "@/util/tools";
 import Comment from "@/components/Comment";
 
 export default {
   name: "ArticleDetail",
   data() {
     return {
-      id: Number,
+      id: String,
       article: {},
       relation: '+ 关注',
       flag: 0,
@@ -108,7 +108,7 @@ export default {
     getDetail(id) {
       getArticleDetail(id).then((res) => {
         this.article = res.data.article
-        this.article.tags = this.article.tags.split(",")
+        console.log(this.article.isLike)
         this.article.createTime = (new Date(this.article.createTime)).toLocaleString()
         if (this.article.updateTime == null) {
           this.time = this.article.createTime
@@ -116,6 +116,9 @@ export default {
           this.article.updateTime = (new Date(this.article.createTime)).toLocaleString()
           this.time = this.article.updateTime
         }
+        this.article.views=getCount( this.article.views);
+        this.article.likeNum=getCount(this.article.likeNum);
+        this.article.comments=getCount(this.article.comments)
         console.log(this.article)
       })
     },
@@ -143,17 +146,16 @@ export default {
         this.article.likeNum += 1
       }
     },
-    getIsLikeArticle(id) {
-      getArticleIsLike(id).then((res) => {
-        this.article.isLike = res.data.isLike
-      })
-    },
     getDate(date) {
       return getDate(date);
     },
     changeType(){
       this.type=1;
       this.type=0;
+    },
+    searchByTag(tag){
+      tag='#'+tag+'#'
+      this.$router.push("/search?keyword="+encodeURIComponent(tag));
     }
   },
   components: {
@@ -165,7 +167,6 @@ export default {
     let id = this.$route.query.id
     this.id = id
     this.getDetail(id)
-    this.getIsLikeArticle(id)
   }
 }
 </script>
@@ -176,7 +177,9 @@ li {
   float: left;
   text-align: left;
 }
-
+.el-link+.el-link{
+  margin-left: 4px;
+}
 li + li {
   margin-left: 10px;
 }
@@ -209,7 +212,17 @@ span + span {
 .comments {
   margin-left: 10px;
 }
+::v-deep .el-icon-view{
+  background: url('../static/images/view.svg') center no-repeat;
+  font-size: 20px;
+  background-size: cover;
+}
 
+::v-deep .el-icon-view:before {
+  content: "替";
+  font-size: 20px;
+  visibility: hidden;
+}
 ::v-deep .el-icon-like {
   background: url('../static/images/like.svg') center no-repeat;
   font-size: 20px;

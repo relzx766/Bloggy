@@ -67,9 +67,11 @@ service.interceptors.request.use(
         // 每次发送请求之前判断是否存在token
         // 如果存在，则统一在http请求的header都加上token，这样后台根据token判断你的登录情况，此处token一般是用户完成登录后储存到localstorage里的
         let token=localStorage.getItem("satoken");
+        console.log(token)
         if(token){
             config.headers.satoken = token
         }
+        console.log(config)
         return config
     },
     (error) => {
@@ -83,7 +85,7 @@ service.interceptors.response.use(
         // 否则的话抛出错误
         if (response.status === 200) {
             if (response.data.code === 2011) {
-                window.location.href("localhost:8081/login");
+                window.location.href="localhost:8081/login";
             }
             else {
                 return Promise.resolve(response);
