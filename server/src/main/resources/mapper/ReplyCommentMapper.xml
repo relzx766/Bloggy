@@ -16,19 +16,50 @@
         where exists(select article_comment_id from tb_article_comment where article_comment_id = #{commentId})
           and exists(select id from tb_user where id = #{userId})
     </insert>
+    <insert id="addLike">
+        insert into tb_reply_comment_like(user_id, comment_id, create_time)
+        select
+        temp2.fromId,temp2.toId, temp2.create_time
+        from
+        (select temp.fromId,temp.toId,temp.create_time
+        from(
+        <foreach collection="thumbs" item="item" separator="union">
+            select #{item.fromId} as fromId,#{item.toId} as toId,#{item.createTime} as create_time
+        </foreach>
+        )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_article_comment as tac on
+        tac.article_comment_id=temp.toId
+        where tu.id is not null and tac.article_comment_id is not null)as temp2
+
+    </insert>
+    <update id="updateLikeNum">
+        update tb_reply_comment
+        set like_num=like_num + #{num}
+        where reply_comment_id = #{id}
+    </update>
+    <delete id="delLike">
+        delete from tb_reply_comment_like where comment_id in (
+        select temp.comment_id from(
+        <foreach collection="thumbs" item="item" separator="union">
+            select comment_id from tb_reply_comment_like where comment_id=#{item.toId} and user_id=#{item.fromId}
+        </foreach>)temp
+        )
+    </delete>
     <select id="getByArtCommentId" resultMap="com.zyq.bloggy.mapper.ArticleCommentMapper.baseCommentMap">
-        select trc.reply_comment_id as reply_id,
+        select trc.reply_comment_id                  as reply_id,
                trc.content,
                trc.like_num,
                trc.create_time,
-               tu.id                as user_id,
+               tu.id                                 as user_id,
                tu.username,
                tu.nickname,
                tu.avatar,
-               trc.comment_id
+               trc.comment_id,
+               if(ISNULL(trcl.user_id), false, true) as is_like
         from tb_reply_comment trc
                  join tb_user tu on trc.user_id = tu.id
                  join tb_article_comment tac on tac.article_comment_id = trc.comment_id
+                 left join tb_reply_comment_like trcl
+                           on trcl.comment_id = trc.reply_comment_id and trcl.user_id = #{userId}
         where trc.comment_id = #{id}
     </select>
     <select id="getByCommentIdLimited" resultMap="com.zyq.bloggy.mapper.ArticleCommentMapper.baseCommentMap">
@@ -45,5 +76,11 @@
                  join tb_user tu on trc.user_id = tu.id
                  join tb_article_comment tac on tac.article_comment_id = trc.comment_id
         where trc.comment_id = #{id}
+    </select>
+    <select id="getIsLike" resultType="java.lang.Integer">
+        select count(*)
+        from tb_reply_comment_like
+        where comment_id = #{commentId}
+          and user_id = #{userId}
     </select>
 </mapper>

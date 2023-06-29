@@ -1,7 +1,7 @@
 package com.zyq.bloggy.mapStruct;
 
-import com.zyq.bloggy.pojo.User;
-import com.zyq.bloggy.vo.UserVo;
+import com.zyq.bloggy.model.pojo.User;
+import com.zyq.bloggy.model.vo.UserVo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

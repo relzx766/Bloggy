@@ -50,7 +50,7 @@ spring:
       mail:
         smtp:
           timeout: 10000
-          localhost: #######
+          localhost: ########
           auth: true
           starttls:
             enable: true

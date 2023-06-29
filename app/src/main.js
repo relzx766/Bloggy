@@ -6,12 +6,10 @@ import 'element-ui/lib/theme-chalk/index.css';
 import VueCookies from 'vue-cookie'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
-
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(VueCookies)
 Vue.use(mavonEditor)
-
 Vue.directive('click-outside', {
     // 初始化指令
     bind (el, binding) {

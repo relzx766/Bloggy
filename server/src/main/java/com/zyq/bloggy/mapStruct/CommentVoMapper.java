@@ -1,9 +1,9 @@
 package com.zyq.bloggy.mapStruct;
 
-import com.zyq.bloggy.pojo.ArticleComment;
-import com.zyq.bloggy.pojo.ReplyComment;
-import com.zyq.bloggy.pojo.User;
-import com.zyq.bloggy.vo.CommentVo;
+import com.zyq.bloggy.model.pojo.ArticleComment;
+import com.zyq.bloggy.model.pojo.ReplyComment;
+import com.zyq.bloggy.model.pojo.User;
+import com.zyq.bloggy.model.vo.CommentVo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

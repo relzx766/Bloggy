@@ -1,9 +1,9 @@
 package com.zyq.bloggy.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.zyq.bloggy.pojo.Article;
-import com.zyq.bloggy.pojo.ThumbsUp;
-import com.zyq.bloggy.vo.ArticleVo;
+import com.zyq.bloggy.model.pojo.Article;
+import com.zyq.bloggy.model.entity.ThumbsUp;
+import com.zyq.bloggy.model.vo.ArticleVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -12,13 +12,25 @@ import java.util.List;
 
 @Repository
 public interface ArticleMapper extends BaseMapper<Article> {
+    Article getById(long id);
+
+    int updateByUserId(@Param("article") Article article, @Param("userId") long userId);
+
+    int updateStatusById(@Param("id") long id, @Param("status") int status);
+
+    ArticleVo getDetail(@Param("articleId") long articleId);
+
     int addArticle(@Param("art") Article article);
 
     int delByIdsAndAuthor(@Param("userId") Long userId, @Param("ids") ArrayList<Long> ids);
 
-    List<Article> getByTags(String tags);
+    ArrayList<ArticleVo> getByTags(@Param("tags") String[] tags, @Param("current") int current, @Param("size") int size);
+
+    int getCountByTags(@Param("tags") String[] tags);
 
     List<ArticleVo> getLimited(int current, int size);
+
+    List<ArticleVo> getArticleLimit(int current, int size);
 
     List<ArticleVo> getByKeyword(@Param("keyword") String keyword, @Param("current") int current, @Param("size") int size);
 
@@ -27,6 +39,8 @@ public interface ArticleMapper extends BaseMapper<Article> {
     int getCountByKeyword(String keyword);
 
     int addLike(List<ThumbsUp> thumbs);
+
+    int getLike(@Param("userId") long userId, @Param("articleId") long articleId);
 
     int delLike(List<ThumbsUp> thumbs);
 

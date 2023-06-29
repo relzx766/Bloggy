@@ -7,15 +7,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.mapStruct.CommentVoMapper;
 import com.zyq.bloggy.mapper.ReplyCommentMapper;
-import com.zyq.bloggy.pojo.ReplyComment;
-import com.zyq.bloggy.pojo.Status;
+import com.zyq.bloggy.model.pojo.ReplyComment;
+import com.zyq.bloggy.model.entity.Status;
+import com.zyq.bloggy.model.entity.ThumbsUp;
+import com.zyq.bloggy.serivce.RedisService;
 import com.zyq.bloggy.serivce.ReplyCommentService;
 import com.zyq.bloggy.serivce.UserService;
 import com.zyq.bloggy.util.StringUtils;
-import com.zyq.bloggy.vo.CommentVo;
+import com.zyq.bloggy.model.vo.CommentVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -36,7 +40,13 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     @Autowired
     UserService userService;
     @Autowired
+    RedisService redisService;
+    @Autowired
     RedisTemplate redisTemplate;
+    private static final String KEY_REPLY_LIKE_COUNT = "count:like:reply";
+    private static final String KEY_REPLY_LIKE = "like:reply";
+    private static final String KEY_ARTICLE_COMMENT_COUNT = "count:comment:article";
+    private static final String KEY_REPLY_IS_LIKE = "isLike:reply";
 
     @Override
     public CommentVo post(ReplyComment replyComment) {
@@ -52,14 +62,16 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
         replyComment.setStatus(Status.ACTIVE.getCode());
         replyComment.setCreateTime(new Timestamp(System.currentTimeMillis()));
         replyCommentMapper.addComment(replyComment);
-        BoundHashOperations<String, String, Object> operations = redisTemplate.boundHashOps("count:article:comment:" + replyComment.getCommentId());
+        //以一级评论的id作为键
+        BoundHashOperations<String, String, Object> operations = redisTemplate.boundHashOps(KEY_ARTICLE_COMMENT_COUNT + ":" + replyComment.getCommentId());
         operations.increment("count", 1);
         return commentVoMapper.toVo(replyComment);
     }
 
     @Override
-    public Boolean del(Long id) {
-        return replyCommentMapper.deleteById(id) > 0;
+    public Boolean del(Long id, Long userId) {
+        return replyCommentMapper.delete(new LambdaQueryWrapper<ReplyComment>()
+                .eq(ReplyComment::getId, id).eq(ReplyComment::getUserId, userId)) > 0;
     }
 
     @Override
@@ -78,12 +90,12 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     }
 
     @Override
-    public List<CommentVo> getComments(Long id) {
-        return replyCommentMapper.getByArtCommentId(id);
+    public List<CommentVo> getReplies(Long id, Long userId) {
+        return replyCommentMapper.getByArtCommentId(id, userId);
     }
 
     @Override
-    public Page<CommentVo> getComments(Long id, int page) {
+    public Page<CommentVo> getReplies(Long id, int page) {
         page = page > 0 ? page : 0;
         int size = 10;
         int current = (page - 1) * size;
@@ -95,5 +107,45 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
         voPage.setTotal(replyCommentMapper.selectCount(new LambdaQueryWrapper<ReplyComment>()
                 .eq(ReplyComment::getCommentId, id)));
         return voPage;
+    }
+
+    @Override
+    public void like(ThumbsUp thumbs) {
+        redisService.like(KEY_REPLY_LIKE, thumbs);
+    }
+
+    @Override
+    public void cancelLike(ThumbsUp thumbs) {
+        redisService.cancelLike(KEY_REPLY_LIKE, thumbs);
+    }
+
+    @Override
+    public void saveLikeToDB() {
+        Map<Long, List<ThumbsUp>> like = redisService.getLike(KEY_REPLY_LIKE);
+        Map<Long, List<ThumbsUp>> cancel = redisService.getCancelLike(KEY_REPLY_LIKE);
+        like.forEach((replyId, thumbs) -> {
+            int countOfNewLike = replyCommentMapper.addLike(thumbs);
+            updateLikeNum(replyId, countOfNewLike);
+        });
+        cancel.forEach((replyId, thumbs) -> {
+            int countOfCancelLike = replyCommentMapper.delLike(thumbs);
+            updateLikeNum(replyId, -countOfCancelLike);
+        });
+    }
+
+    @Override
+    public void updateLikeNum(long id, int num) {
+        BoundHashOperations<String, String, Integer> operations = redisTemplate.boundHashOps(KEY_REPLY_LIKE_COUNT);
+        operations.keys().stream().forEach(key -> {
+            int count = operations.get(key);
+            replyCommentMapper.updateLikeNum(Long.parseLong(key), count);
+            operations.delete(key);
+        });
+    }
+
+    @Override
+    @Cacheable(cacheNames = "isLike:reply#60", key = "#replyId+':'+#userId")
+    public boolean getIsLiked(Long userId, Long replyId) {
+        return replyCommentMapper.getIsLike(replyId, userId) > 0;
     }
 }

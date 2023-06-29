@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import {login} from "../api";
+import {login} from "@/api/User";
 export default {
   name: 'Login',
   data() {
@@ -59,18 +59,31 @@ export default {
         if (valid) {
           login(that.userForm).then((res)=>{
             if (res.code===2001) {
+              let role=res.data.user.role
               localStorage.setItem(res.data.token.tokenName,res.data.token.tokenValue)
               that.$cookie.set("id",res.data.user.id,24*60*60*30)
               that.$cookie.set("username",res.data.user.username,24*60*60*30)
               that.$cookie.set("nickname",res.data.user.nickname,24*60*60*30)
               that.$cookie.set("avatar",res.data.user.avatar,24*60*60*30)
+              that.$cookie.set("role",res.data.user.role,24*60*60*30)
               that.$notify({
                 title: "Bloggy",
                 message: res.message,
                 type: "success",
                 duration:1000
               })
-              that.$router.push("/index")
+              if (role==="member") {
+                that.$router.push("/index")
+              }else if (role==="admin"){
+                that.$router.push("/admin/index")
+              }else {
+                that.$notify({
+                  title: "Bloggy",
+                  message: "error",
+                  type: "error",
+                  duration:1000
+                })
+              }
             }else {
               that.$notify({
                 title: "Bloggy",

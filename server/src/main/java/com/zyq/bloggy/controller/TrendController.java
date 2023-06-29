@@ -1,13 +1,14 @@
 package com.zyq.bloggy.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zyq.bloggy.exception.ServiceException;
-import com.zyq.bloggy.pojo.Result;
+import com.zyq.bloggy.model.entity.Result;
 import com.zyq.bloggy.serivce.ArticleService;
 import com.zyq.bloggy.serivce.RedisService;
 import com.zyq.bloggy.util.FileUtil;
-import com.zyq.bloggy.vo.AdvertisingVo;
+import com.zyq.bloggy.model.vo.AdvertisingVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +39,7 @@ public class TrendController {
     }
 
     @PostMapping("/ad/add")
+    @SaCheckRole("ADMIN")
     public Result addAd(@RequestParam("ad") String ad,
                         @RequestParam("image") MultipartFile multipartFile) {
 
@@ -48,7 +50,9 @@ public class TrendController {
             throw new ServiceException(String.format("json转换失败{}", ad), e);
         }
         advertisingVo.setImage(FileUtil.save(multipartFile));
-        redisService.addAdvertising(advertisingVo);
-        return Result.ok();
+        advertisingVo = redisService.addAdvertising(advertisingVo);
+        Map<String, Object> data = new HashMap<>();
+        data.put("ad", advertisingVo);
+        return Result.ok(data);
     }
 }

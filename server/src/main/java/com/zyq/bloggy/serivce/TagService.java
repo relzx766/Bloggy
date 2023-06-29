@@ -1,7 +1,7 @@
 package com.zyq.bloggy.serivce;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.zyq.bloggy.pojo.Tag;
+import com.zyq.bloggy.model.pojo.Tag;
 
 import java.util.ArrayList;
 import java.util.List;

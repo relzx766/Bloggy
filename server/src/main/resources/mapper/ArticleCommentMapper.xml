@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zyq.bloggy.mapper.ArticleCommentMapper">
-    <resultMap id="baseCommentMap" type="com.zyq.bloggy.vo.CommentVo">
+    <resultMap id="baseCommentMap" type="com.zyq.bloggy.model.vo.CommentVo">
         <id property="commentId" column="comment_id"/>
         <result property="content" column="content"/>
         <result property="likeNum" column="like_num"/>
@@ -11,6 +11,7 @@
         <result property="avatar" column="avatar"/>
         <result property="replyId" column="reply_id"/>
         <result property="createTime" column="create_time"/>
+        <result property="isLike" column="is_like"/>
     </resultMap>
     <insert id="addComment">
         insert into tb_article_comment(article_comment_id, article_id, user_id, content, like_num, create_time, status)
@@ -24,6 +25,36 @@
         where exists(select id from tb_article where id = #{articleId})
           and exists(select id from tb_user where id = #{userId})
     </insert>
+    <insert id="addLike">
+        <!--        insert into tb_article_comment_like(user_id, comment_id, create_time)
+                select temp.fromId, temp.toId, temp.createTime
+                from (
+                <foreach collection="thumbs" item="item" separator="union">
+                    select #{item.fromId},#{item.toId},#{item.createTime}
+                    where exists(select id from tb_user where id=#{item.fromId})
+                    and exists(select article_comment_id from tb_article_comment where article_comment_id=#{item.toId})
+                </foreach>
+                ) as temp
+                where temp.fromId not in (select user_id from tb_article_comment_like)
+                and temp.toId not in (select comment_id from tb_article_comment_like)-->
+        insert into tb_article_comment_like(user_id, comment_id, create_time)
+        select
+        temp2.fromId,temp2.toId, temp2.create_time
+        from
+        (select temp.fromId,temp.toId,temp.create_time
+        from(
+        <foreach collection="thumbs" item="item" separator="union">
+            select #{item.fromId} as fromId,#{item.toId} as toId,#{item.createTime} as create_time
+        </foreach>
+        )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_article_comment as tac on
+        tac.article_comment_id=temp.toId
+        where tu.id is not null and tac.article_comment_id is not null)as temp2
+    </insert>
+    <update id="updateLikeNumInt">
+        update tb_article_comment
+        set like_num=like_num + #{num}
+        where article_comment_id = #{id}
+    </update>
     <delete id="delByCommentId">
         start transaction;
         delete
@@ -45,6 +76,14 @@
         #{id}
     </foreach>;
     </delete>
+    <delete id="delLike">
+        delete from tb_article_comment_like where comment_id in (
+        select temp.comment_id from(
+        <foreach collection="thumbs" item="item" separator="union">
+            select comment_id from tb_article_comment_like where comment_id=#{item.toId} and user_id=#{item.fromId}
+        </foreach>)temp
+        )
+    </delete>
     <select id="getCommentByArticleId" resultMap="baseCommentMap">
         select tac.article_comment_id as comment_id,
                tac.content,
@@ -59,17 +98,36 @@
         where tac.article_id = #{id}
     </select>
     <select id="getCommentByArticleIdLimited" resultMap="baseCommentMap">
-        select tac.article_comment_id as comment_id,
+        select tac.article_comment_id                as comment_id,
                tac.content,
                tac.like_num,
                tac.create_time,
-               tu.id                  as user_id,
+               tu.id                                 as user_id,
                tu.username,
                tu.nickname,
-               tu.avatar
+               tu.avatar,
+               if(ISNULL(tacl.user_id), false, true) as is_like
         from tb_article_comment tac
                  join tb_user tu on tac.user_id = tu.id
+                 left join tb_article_comment_like tacl
+                           on tacl.comment_id = tac.article_comment_id and tacl.user_id = #{userId}
         where tac.article_id = #{id}
+        order by tac.like_num desc
         limit #{current},#{size}
+    </select>
+    <select id="getIsLike" resultType="java.lang.Integer">
+        select count(*)
+        from tb_article_comment_like
+        where comment_id = #{commentId}
+          and user_id = #{userId}
+    </select>
+    <select id="getLike" resultType="java.lang.Integer">
+        select count(*)
+        from tb_article_comment_like
+        where user_id = #{userId}
+          and comment_id = #{commentId}
+    </select>
+    <select id="getUserStateById" resultMap="com.zyq.bloggy.mapper.UserMapper.UserStateMap">
+
     </select>
 </mapper>

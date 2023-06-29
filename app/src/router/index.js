@@ -7,6 +7,10 @@ import Index from "@/views/Index"
 import Trend from "@/views/Trend";
 import Write from "@/views/Write";
 import ArticleDetail from "@/views/ArticleDetail";
+import Profile from "@/views/Profile";
+import SearchDetail from "@/views/SearchDetail";
+import BackstageIndex from "@/admin/views/BackstageIndex.vue";
+
 // 解决ElementUI导航栏中的vue-router在3.0版本以上重复点菜单报错问题
 const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
@@ -49,6 +53,21 @@ const routes = [
         path: '/detail',
         name: 'detail',
         component: ArticleDetail
+    },
+    {
+        path:'/profile',
+        name:'profile',
+        component: Profile
+    },
+    {
+        path:'/search',
+        name: 'search',
+        component: SearchDetail
+    },
+    {
+        path:'/admin/index',
+        name: 'admin-index',
+        component: BackstageIndex
     }
 ]
 

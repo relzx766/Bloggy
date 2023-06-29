@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import {register, verify} from "@/api";
+import {register, verify} from "@/api/User";
 
 export default {
   name: 'Register',

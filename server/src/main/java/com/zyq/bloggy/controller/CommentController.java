@@ -1,9 +1,11 @@
 package com.zyq.bloggy.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
-import com.zyq.bloggy.pojo.ArticleComment;
-import com.zyq.bloggy.pojo.ReplyComment;
-import com.zyq.bloggy.pojo.Result;
+import cn.dev33.satoken.stp.StpUtil;
+import com.zyq.bloggy.model.pojo.ArticleComment;
+import com.zyq.bloggy.model.pojo.ReplyComment;
+import com.zyq.bloggy.model.entity.Result;
+import com.zyq.bloggy.model.entity.ThumbsUp;
 import com.zyq.bloggy.serivce.ArticleCommentService;
 import com.zyq.bloggy.serivce.ReplyCommentService;
 import com.zyq.bloggy.util.StringUtils;
@@ -32,7 +34,8 @@ public class CommentController {
 
     @PostMapping("/delete/article")
     public Result delete(@RequestParam("id") Long id) {
-        return articleCommentService.del(id) ? Result.ok() : Result.err();
+        Long userId = StpUtil.getLoginIdAsLong();
+        return articleCommentService.del(id, userId) ? Result.ok() : Result.err();
     }
 
     @PostMapping("/delete/article/admin")
@@ -60,14 +63,16 @@ public class CommentController {
     public Result getCommentPage(@PathVariable("articleId") Long articleId,
                                  @PathVariable("page") Integer page) {
         Map<String, Object> data = new HashMap<>();
-        data.put("comment", articleCommentService.getComments(articleId, page));
+        Long userId = StpUtil.getLoginIdAsLong();
+        data.put("comment", articleCommentService.getComments(articleId, page, userId));
         return Result.ok(data);
     }
 
     @GetMapping("/reply/{commentId}")
     public Result getReply(@PathVariable("commentId") Long id) {
         Map<String, Object> data = new HashMap<>();
-        data.put("reply", replyCommentService.getComments(id));
+        Long userId = StpUtil.getLoginIdAsLong();
+        data.put("reply", replyCommentService.getReplies(id, userId));
         return Result.ok(data);
     }
 
@@ -80,7 +85,8 @@ public class CommentController {
 
     @PostMapping("/delete/reply")
     public Result ReplyDel(@RequestParam("id") Long id) {
-        return replyCommentService.del(id) ? Result.ok() : Result.err();
+        Long userId = StpUtil.getLoginIdAsLong();
+        return replyCommentService.del(id, userId) ? Result.ok() : Result.err();
     }
 
     @PostMapping("/delete/reply/admin")
@@ -93,7 +99,57 @@ public class CommentController {
     public Result getReplyPage(@PathVariable("commentId") Long id,
                                @PathVariable("page") Integer page) {
         Map<String, Object> data = new HashMap<>();
-        data.put("reply", replyCommentService.getComments(id, page));
+        data.put("reply", replyCommentService.getReplies(id, page));
+        return Result.ok(data);
+    }
+
+    @PostMapping("/like")
+    public Result likeComment(@RequestParam("commentId") Long commentId) {
+        ThumbsUp thumbs = new ThumbsUp();
+        thumbs.setFromId(StpUtil.getLoginIdAsLong());
+        thumbs.setToId(commentId);
+        articleCommentService.like(thumbs);
+        return Result.ok();
+    }
+
+    @PostMapping("/like/reply")
+    public Result likeReply(@RequestParam("replyId") Long replyId) {
+        ThumbsUp thumbs = new ThumbsUp();
+        thumbs.setFromId(StpUtil.getLoginIdAsLong());
+        thumbs.setToId(replyId);
+        replyCommentService.like(thumbs);
+        return Result.ok();
+    }
+
+    @PostMapping("/like/cancel")
+    public Result cancelLikeComment(@RequestParam("commentId") Long commentId) {
+        ThumbsUp thumbs = new ThumbsUp();
+        thumbs.setFromId(StpUtil.getLoginIdAsLong());
+        thumbs.setToId(commentId);
+        articleCommentService.cancelLike(thumbs);
+        return Result.ok();
+    }
+
+    @PostMapping("/like/reply/cancel")
+    public Result cancelLikeReply(@RequestParam("replyId") Long replyId) {
+        ThumbsUp thumbs = new ThumbsUp();
+        thumbs.setFromId(StpUtil.getLoginIdAsLong());
+        thumbs.setToId(replyId);
+        replyCommentService.cancelLike(thumbs);
+        return Result.ok();
+    }
+
+    @GetMapping("/like/get/{id}")
+    public Result getIsLikeComment(@PathVariable("id") Long id) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("isLike", articleCommentService.getIsLiked(StpUtil.getLoginIdAsLong(), id));
+        return Result.ok(data);
+    }
+
+    @GetMapping("/like/reply/get/{id}")
+    public Result getIsLikeReply(@PathVariable("id") Long id) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("isLike", replyCommentService.getIsLiked(StpUtil.getLoginIdAsLong(), id));
         return Result.ok(data);
     }
 }

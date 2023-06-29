@@ -2,8 +2,8 @@ package com.zyq.bloggy.serivce.impl;
 
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.exception.ServiceException;
-import com.zyq.bloggy.pojo.Article;
-import com.zyq.bloggy.pojo.User;
+import com.zyq.bloggy.model.pojo.Article;
+import com.zyq.bloggy.model.pojo.User;
 import com.zyq.bloggy.serivce.ArticleService;
 import com.zyq.bloggy.serivce.MailService;
 import com.zyq.bloggy.serivce.UserService;
@@ -26,6 +26,7 @@ import org.thymeleaf.context.Context;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -46,11 +47,11 @@ public class MailServiceImpl implements MailService {
     RedisTemplate redisTemplate;
     private static final String REG_SUBJECT = "Bloggy:验证您的邮箱";
     private static final String ADVICE_SUBJECT = "Bloggy:通知";
+    private static final String KEY_VALIDATE_CODE = "validateCode";
 
     @Override
     @Async
-    @CachePut(cacheNames = "validateCode#1200", key = "#email")
-    public String sendValidateCode(String email) {
+    public void sendValidateCode(String email) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
@@ -63,7 +64,7 @@ public class MailServiceImpl implements MailService {
             String content = templateEngine.process("validateMail", context);
             helper.setText(content, true);
             javaMailSender.send(mimeMessage);
-            return code;
+            redisTemplate.opsForValue().set(KEY_VALIDATE_CODE + ":" + email, code, 20, TimeUnit.MINUTES);
         } catch (MessagingException e) {
             throw new BusinessException("邮件发送错误", e);
         }
@@ -82,7 +83,7 @@ public class MailServiceImpl implements MailService {
 
     @Override
     @Async
-    public Boolean sendWorkDeletedAdvice(Long id, String reason) {
+    public void sendWorkDeletedAdvice(Long id, String reason) {
         Map<String, Object> map = new HashMap<>();
         Article article = articleService.getById(id);
         User user = userService.getUserDetail(article.getAuthor());
@@ -102,9 +103,8 @@ public class MailServiceImpl implements MailService {
             String content = templateEngine.process("authorAdviceMail", context);
             helper.setText(content, true);
             javaMailSender.send(mimeMessage);
-            return true;
-        } catch (MessagingException e) {
-            throw new ServiceException("邮件发送失败", e);
+        } catch (Exception e) {
+            throw new ServiceException("邮件发送失败,该用户可能已注销", e);
         }
     }
 }

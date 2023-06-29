@@ -23,6 +23,9 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 该切面可统计热度，同时也可以计算缓存权重
+ */
 @Aspect
 @Component
 @Order(value = 10)

@@ -1,6 +1,7 @@
 package com.zyq.bloggy.task;
 
 import com.zyq.bloggy.serivce.ArticleService;
+import com.zyq.bloggy.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -18,11 +19,19 @@ public class ArticleTask extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis());
-        log.info("articleTask start--------{}", date);
-        articleService.saveLikeToDB();
-        articleService.updateDBView();
-        articleService.getTrend();
-        articleService.updateCommentNum();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        log.info("articleTask start--------{}", dateFormat.format(System.currentTimeMillis()));
+        try {
+            articleService.saveLikeToDB();
+            articleService.updateDBView();
+            articleService.updateTrend();
+            articleService.updateCommentNum();
+            articleService.decrementTrend();
+        } catch (Exception e) {
+            log.warn("articleTask 运行时出现异常-------{}", StringUtils.getExceptionInfo(e));
+
+        }
+
+        log.info("articleTask end--------{}", dateFormat.format(System.currentTimeMillis()));
     }
 }

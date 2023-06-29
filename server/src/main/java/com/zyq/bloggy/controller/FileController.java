@@ -1,6 +1,6 @@
 package com.zyq.bloggy.controller;
 
-import com.zyq.bloggy.pojo.Result;
+import com.zyq.bloggy.model.entity.Result;
 import com.zyq.bloggy.util.FileUtil;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

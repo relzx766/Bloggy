@@ -1,6 +1,7 @@
 package com.zyq.bloggy.config;
 
 import com.zyq.bloggy.task.ArticleTask;
+import com.zyq.bloggy.task.CommentTask;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,9 +18,17 @@ public class QuartzConfig {
     }
 
     @Bean
-    public Trigger scheduleJobDetailTrigger() {
+    public JobDetail CommentJobDetail() {
+        return JobBuilder.newJob(CommentTask.class)
+                .withIdentity("commentJob")
+                .storeDurably()
+                .build();
+    }
+
+    @Bean
+    public Trigger ArticleJobTrigger() {
         SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
-                .withIntervalInHours(2)
+                .withIntervalInMinutes(2)
                 .repeatForever();
         Trigger trigger = TriggerBuilder
                 .newTrigger()
@@ -27,7 +36,20 @@ public class QuartzConfig {
                 .withIdentity("articleJob")
                 .withSchedule(scheduleBuilder)
                 .build();
-        System.out.println("articleJob trigger end");
+        return trigger;
+    }
+
+    @Bean
+    public Trigger CommentJobTrigger() {
+        SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule()
+                .withIntervalInMinutes(2)
+                .repeatForever();
+        Trigger trigger = TriggerBuilder
+                .newTrigger()
+                .forJob(CommentJobDetail())
+                .withIdentity("commentJob")
+                .withSchedule(scheduleBuilder)
+                .build();
         return trigger;
     }
 

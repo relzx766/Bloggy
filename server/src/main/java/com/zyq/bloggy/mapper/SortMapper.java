@@ -1,7 +1,7 @@
 package com.zyq.bloggy.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.zyq.bloggy.pojo.Sort;
+import com.zyq.bloggy.model.pojo.Sort;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 

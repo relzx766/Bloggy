@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zyq.bloggy.mapper.ThumbsUpMapper">
+
+    <insert id="addToArticle" parameterType="com.zyq.bloggy.model.entity.ThumbsUp">
+        insert into tb_like_article(user_id, article_id, like_time)
+        <foreach collection="thumbs" item="item" separator="union">
+            select #{item.fromId},#{item.toId},#{item.createTime}
+            where exists(select id from tb_user where id=#{item.fromId})
+            and exists(select id from tb_article where id=#{item.toId})
+        </foreach>
+    </insert>
+    <delete id="delFromArticle">
+        delete from tb_like_article where user_id and article_id in
+        <foreach collection="thumbs" item="item" open="(" separator="," close=")">
+            #{item.fromId},#{item.toId}
+        </foreach>
+
+    </delete>
+    <select id="getIsLikeArticle" resultType="java.lang.Integer">
+        select 1
+        from tb_like_article
+        where user_id = #{userId}
+          and article_id = #{articleId}
+    </select>
+    <insert id="addToArticleComment" parameterType="com.zyq.bloggy.model.entity.ThumbsUp">
+        insert into tb_article_comment_like(user_id, comment_id, create_time)
+        <foreach collection="thumbs" item="item" separator="union">
+            select #{item.fromId},#{item.toId},#{item.createTime}
+            where exists(select id from tb_user where id=#{item.fromId})
+            and exists(select article_comment_id from tb_article_comment where article_comment_id=#{item.toId})
+        </foreach>
+    </insert>
+    <delete id="delFromArticleComment">
+        delete from tb_article_comment_like where user_id and comment_id in
+        <foreach collection="thumbs" item="item" open="(" separator="," close=")">
+            #{item.fromId},#{item.toId}
+        </foreach>
+    </delete>
+    <select id="getIsLikeArticleComment" resultType="java.lang.Integer">
+        select 1
+        from tb_article_comment_like
+        where user_id = #{userId}
+          and comment_id = #{commentId}
+    </select>
+    <insert id="addToReplyComment">
+        insert into tb_reply_comment_like(user_id, comment_id, create_time)
+        <foreach collection="thumbs" item="item" separator="union">
+            select #{item.fromId},#{item.toId},#{item.createTime}
+            where exists(select id from tb_user where id=#{item.fromId})
+            and exists(select reply_comment_id from tb_reply_comment where reply_comment_id=#{item.toId})
+        </foreach>
+    </insert>
+    <delete id="delFromReplyComment">
+        delete from tb_reply_comment_like where user_id and comment_id in
+        <foreach collection="thumbs" item="item" open="(" separator="," close=")">
+            #{item.fromId},#{item.toId}
+        </foreach>
+    </delete>
+    <select id="getIsLikeReplyComment" resultType="java.lang.Integer">
+        select 1
+        from tb_reply_comment_like
+        where user_id = #{userId}
+          and comment_id = #{commentId}
+    </select>
+</mapper>
