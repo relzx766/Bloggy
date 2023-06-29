@@ -1,4 +1,4 @@
-package com.zyq.bloggy.pojo;
+package com.zyq.bloggy.model.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -13,11 +13,14 @@ import java.sql.Timestamp;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("tb_tag")
-public class Tag {
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+@TableName("tb_article_comment")
+public class ArticleComment {
+    @TableId(value = "article_comment_id", type = IdType.ASSIGN_ID)
+    private Long id;
+    private Long articleId;
+    private Long userId;
     private String content;
+    private Integer likeNum;
     @TableLogic
     private Integer status;
     private Timestamp createTime;

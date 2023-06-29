@@ -1,9 +1,10 @@
 package com.zyq.bloggy.serivce;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.zyq.bloggy.pojo.User;
-import com.zyq.bloggy.vo.UserStateVo;
-import com.zyq.bloggy.vo.UserVo;
+import com.zyq.bloggy.model.pojo.User;
+import com.zyq.bloggy.model.vo.UserStateVo;
+import com.zyq.bloggy.model.vo.UserVo;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 
@@ -32,11 +33,10 @@ public interface UserService {
     //根据用户名，昵称获取
     List<UserVo> getUser(String account);
 
-    Page<UserVo> getUser(Integer page);
+    Page<User> getUser(Integer page);
 
     Integer getRole(Long id);
 
-    UserStateVo getUserStats(Long id);
 
     boolean checkUsernameIsUsed(String username);
 

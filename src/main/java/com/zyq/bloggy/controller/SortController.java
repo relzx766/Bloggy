@@ -1,7 +1,7 @@
 package com.zyq.bloggy.controller;
 
-import com.zyq.bloggy.pojo.Result;
-import com.zyq.bloggy.pojo.Sort;
+import com.zyq.bloggy.model.entity.Result;
+import com.zyq.bloggy.model.pojo.Sort;
 import com.zyq.bloggy.serivce.SortService;
 import com.zyq.bloggy.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;

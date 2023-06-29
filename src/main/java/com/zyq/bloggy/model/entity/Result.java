@@ -1,4 +1,4 @@
-package com.zyq.bloggy.pojo;
+package com.zyq.bloggy.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

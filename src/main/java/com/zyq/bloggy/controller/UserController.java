@@ -3,12 +3,13 @@ package com.zyq.bloggy.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.stp.StpUtil;
-import com.zyq.bloggy.pojo.Result;
-import com.zyq.bloggy.pojo.User;
+import com.zyq.bloggy.model.entity.Result;
+import com.zyq.bloggy.model.pojo.User;
 import com.zyq.bloggy.serivce.MailService;
 import com.zyq.bloggy.serivce.UserService;
 import com.zyq.bloggy.util.FileUtil;
-import com.zyq.bloggy.vo.UserVo;
+import com.zyq.bloggy.model.vo.UserVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -25,7 +27,6 @@ public class UserController {
     UserService userService;
     @Autowired
     MailService mailService;
-    private Logger logger = Logger.getLogger(this.getClass());
 
     @PostMapping("/register")
     public Result register(@RequestBody User user) {
@@ -80,18 +81,13 @@ public class UserController {
         return Result.ok(data);
     }
 
-    @GetMapping("/state/{id}")
-    public Result getState(@PathVariable("id") Long id) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("state", userService.getUserStats(id));
-        return Result.ok(data);
-    }
 
     @PostMapping("/profile/update")
     public Result updateProfile(@RequestParam("nickname") String nickname,
                                 @RequestParam("avatar") MultipartFile multipartFile) {
         Map<String, Object> data = new HashMap<>();
         User user = new User();
+        user.setId(StpUtil.getLoginIdAsLong());
         user.setNickname(nickname);
         if (!multipartFile.isEmpty()) {
             user.setAvatar(FileUtil.save(multipartFile));
@@ -118,7 +114,15 @@ public class UserController {
     @PostMapping("/close")
     @SaCheckRole("ADMIN")
     public Result closeAccount(@RequestParam("id") Long id) {
-        logger.info(String.format("管理员{%s}对账号{%s}执行了注销操作", StpUtil.getLoginIdAsString(), id));
-        return userService.closeAccount(id) ? Result.ok() : Result.err();
+        userService.closeAccount(id);
+        log.info(String.format("管理员{%s}对账号{%s}执行了注销操作", StpUtil.getLoginIdAsString(), id));
+        return Result.ok();
+    }
+
+    @PostMapping("/active")
+    public Result activeAccount(@RequestParam("id") Long id) {
+        userService.activeAccount(id);
+        log.info(String.format("用户{%s}账号重新激活", id));
+        return Result.ok();
     }
 }

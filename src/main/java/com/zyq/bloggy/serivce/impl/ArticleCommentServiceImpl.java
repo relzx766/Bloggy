@@ -7,14 +7,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.mapStruct.CommentVoMapper;
 import com.zyq.bloggy.mapper.ArticleCommentMapper;
-import com.zyq.bloggy.pojo.ArticleComment;
-import com.zyq.bloggy.pojo.Status;
-import com.zyq.bloggy.pojo.User;
+import com.zyq.bloggy.model.pojo.ArticleComment;
+import com.zyq.bloggy.model.entity.Status;
+import com.zyq.bloggy.model.entity.ThumbsUp;
+import com.zyq.bloggy.model.pojo.User;
 import com.zyq.bloggy.serivce.ArticleCommentService;
+import com.zyq.bloggy.serivce.RedisService;
 import com.zyq.bloggy.serivce.ReplyCommentService;
 import com.zyq.bloggy.serivce.UserService;
 import com.zyq.bloggy.util.StringUtils;
-import com.zyq.bloggy.vo.CommentVo;
+import com.zyq.bloggy.model.vo.CommentVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -44,6 +46,12 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
     UserService userService;
     @Autowired
     RedisTemplate redisTemplate;
+    @Autowired
+    RedisService redisService;
+    public static final String KEY_COMMENT_LIKE_COUNT = "count:like:comment";
+    public static final String KEY_COMMENT_LIKE = "like:comment";
+    private static final String KEY_ARTICLE_COMMENT_COUNT = "count:comment:article";
+    private static final String KEY_COMMENT_IS_LIKE = "isLike:comment";
 
     @Override
     public CommentVo post(ArticleComment articleComment) {
@@ -56,7 +64,8 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         articleComment.setStatus(Status.ACTIVE.getCode());
         articleComment.setCreateTime(new Timestamp(System.currentTimeMillis()));
         articleCommentMapper.addComment(articleComment);
-        BoundHashOperations<String, String, Object> operations = redisTemplate.boundHashOps("count:article:comment:" + articleComment.getId());
+        //以评论id作为键，方便二级评论统计
+        BoundHashOperations<String, String, Object> operations = redisTemplate.boundHashOps(KEY_ARTICLE_COMMENT_COUNT + ":" + articleComment.getId());
         operations.put("articleId", articleComment.getArticleId().toString());
         operations.increment("count", 1);
         return commentVoMapper.toVo(articleComment);
@@ -64,8 +73,9 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
 
     @Override
     @Transactional
-    public Boolean del(Long id) {
-        return articleCommentMapper.deleteById(id) > 0;
+    public Boolean del(Long id, Long userId) {
+        return articleCommentMapper.delete(new LambdaQueryWrapper<ArticleComment>()
+                .eq(ArticleComment::getId, id).eq(ArticleComment::getUserId, userId)) > 0;
     }
 
     @Override
@@ -101,16 +111,58 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
     }
 
     @Override
-    public Page<CommentVo> getComments(Long id, int page) {
+    public Page<CommentVo> getComments(Long id, int page, Long userId) {
         page = page > 0 ? page : 0;
         int size = 15;
         int current = (page - 1) * size;
         Page<CommentVo> voPage = new Page<>();
-        List<CommentVo> record = articleCommentMapper.getCommentByArticleIdLimited(id, current, size);
+        List<CommentVo> record = articleCommentMapper.getCommentByArticleIdLimited(id, current, size, userId);
         voPage.setRecords(record);
         voPage.setCurrent(page);
         voPage.setSize(record.size());
         voPage.setTotal(articleCommentMapper.selectCount(new LambdaQueryWrapper<ArticleComment>().eq(ArticleComment::getArticleId, id)));
         return voPage;
+    }
+
+    @Override
+    public void like(ThumbsUp thumbs) {
+        redisService.like(KEY_COMMENT_LIKE, thumbs);
+    }
+
+    @Override
+    public void cancelLike(ThumbsUp thumbs) {
+        redisService.cancelLike(KEY_COMMENT_LIKE, thumbs);
+    }
+
+    @Override
+    public void updateLikeNum(long id, int num) {
+        articleCommentMapper.updateLikeNumInt(id, num);
+    }
+
+    @Override
+    public void saveLikeToDB() {
+        log.info("开始将点赞信息存入数据库");
+        Map<Long, List<ThumbsUp>> like = redisService.getLike(KEY_COMMENT_LIKE);
+        Map<Long, List<ThumbsUp>> cancel = redisService.getCancelLike(KEY_COMMENT_LIKE);
+        like.forEach((commentId, thumbs) -> {
+            //获取的为commentId:thumbs形式，即使存在commentId，thumbs还是可能为空的
+            if (thumbs.size() > 0) {
+                int countOfNewLike = articleCommentMapper.addLike(thumbs);
+                updateLikeNum(commentId, countOfNewLike);
+            }
+        });
+        cancel.forEach((commentId, thumbs) -> {
+            if (thumbs.size() > 0) {
+                int countOfCancelLike = articleCommentMapper.delLike(thumbs);
+                updateLikeNum(commentId, -countOfCancelLike);
+            }
+        });
+        log.info("存入结束");
+    }
+
+    @Override
+    @Cacheable(cacheNames = "isLike:comment#60", key = "#commentId+':'+#userId")
+    public boolean getIsLiked(Long userId, Long commentId) {
+        return articleCommentMapper.getIsLike(commentId, userId) > 0;
     }
 }

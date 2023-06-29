@@ -1,9 +1,9 @@
-package com.zyq.bloggy.pojo;
+package com.zyq.bloggy.model.entity;
 
 public enum Status {
-    //活跃状态
+    //活跃状态,点赞状态
     ACTIVE(1),
-    //删除，注销状态
+    //删除，注销，取消点赞状态
     INACTIVE(0),
     //注册但未激活，邮箱未验证
     NONACTIVE(2);

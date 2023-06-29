@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zyq.bloggy.mapper.UserMapper">
-    <resultMap id="UserStateMap" type="com.zyq.bloggy.vo.UserStateVo">
+    <resultMap id="UserStateMap" type="com.zyq.bloggy.model.vo.UserStateVo">
         <result property="beLikeCount" column="be_like_count"/>
         <result property="viewCount" column="view_count"/>
         <result property="articleCount" column="article_count"/>

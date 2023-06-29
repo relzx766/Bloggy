@@ -1,4 +1,4 @@
-package com.zyq.bloggy.vo;
+package com.zyq.bloggy.model.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +23,8 @@ public class ArticleVo {
     private Timestamp createTime;
     private Timestamp updateTime;
     private UserVo userVo;
-    private String tags;
+
+    private String[] tags;
     private Boolean isLike;
     private String description;
     private Integer trend;

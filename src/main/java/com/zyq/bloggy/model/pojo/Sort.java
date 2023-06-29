@@ -1,4 +1,4 @@
-package com.zyq.bloggy.pojo;
+package com.zyq.bloggy.model.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

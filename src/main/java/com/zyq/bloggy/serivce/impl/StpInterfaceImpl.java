@@ -1,7 +1,7 @@
 package com.zyq.bloggy.serivce.impl;
 
 import cn.dev33.satoken.stp.StpInterface;
-import com.zyq.bloggy.pojo.Role;
+import com.zyq.bloggy.model.entity.Role;
 import com.zyq.bloggy.serivce.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

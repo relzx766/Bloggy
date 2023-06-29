@@ -1,4 +1,4 @@
-package com.zyq.bloggy.pojo;
+package com.zyq.bloggy.model.entity;
 
 public enum Role {
     //管理员

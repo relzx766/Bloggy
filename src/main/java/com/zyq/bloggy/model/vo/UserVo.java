@@ -1,4 +1,4 @@
-package com.zyq.bloggy.vo;
+package com.zyq.bloggy.model.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

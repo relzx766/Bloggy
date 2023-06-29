@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zyq.bloggy.mapper.ArticleCommentMapper">
-    <resultMap id="baseCommentMap" type="com.zyq.bloggy.vo.CommentVo">
+    <resultMap id="baseCommentMap" type="com.zyq.bloggy.model.vo.CommentVo">
         <id property="commentId" column="comment_id"/>
         <result property="content" column="content"/>
         <result property="likeNum" column="like_num"/>
@@ -39,7 +39,7 @@
                 and temp.toId not in (select comment_id from tb_article_comment_like)-->
         insert into tb_article_comment_like(user_id, comment_id, create_time)
         select
-        temp2.fromId, toId, create_time
+        temp2.fromId,temp2.toId, temp2.create_time
         from
         (select temp.fromId,temp.toId,temp.create_time
         from(
@@ -49,8 +49,6 @@
         )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_article_comment as tac on
         tac.article_comment_id=temp.toId
         where tu.id is not null and tac.article_comment_id is not null)as temp2
-        left join tb_article_comment_like tacl on tacl.user_id=temp2.fromId and tacl.comment_id=temp2.toId where
-        tacl.user_id is null
     </insert>
     <update id="updateLikeNumInt">
         update tb_article_comment
@@ -100,17 +98,21 @@
         where tac.article_id = #{id}
     </select>
     <select id="getCommentByArticleIdLimited" resultMap="baseCommentMap">
-        select tac.article_comment_id as comment_id,
+        select tac.article_comment_id                as comment_id,
                tac.content,
                tac.like_num,
                tac.create_time,
-               tu.id                  as user_id,
+               tu.id                                 as user_id,
                tu.username,
                tu.nickname,
-               tu.avatar
+               tu.avatar,
+               if(ISNULL(tacl.user_id), false, true) as is_like
         from tb_article_comment tac
                  join tb_user tu on tac.user_id = tu.id
+                 left join tb_article_comment_like tacl
+                           on tacl.comment_id = tac.article_comment_id and tacl.user_id = #{userId}
         where tac.article_id = #{id}
+        order by tac.like_num desc
         limit #{current},#{size}
     </select>
     <select id="getIsLike" resultType="java.lang.Integer">
@@ -118,5 +120,14 @@
         from tb_article_comment_like
         where comment_id = #{commentId}
           and user_id = #{userId}
+    </select>
+    <select id="getLike" resultType="java.lang.Integer">
+        select count(*)
+        from tb_article_comment_like
+        where user_id = #{userId}
+          and comment_id = #{commentId}
+    </select>
+    <select id="getUserStateById" resultMap="com.zyq.bloggy.mapper.UserMapper.UserStateMap">
+
     </select>
 </mapper>

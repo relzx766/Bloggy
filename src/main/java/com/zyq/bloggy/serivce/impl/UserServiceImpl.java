@@ -8,20 +8,21 @@ import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.exception.ServiceException;
 import com.zyq.bloggy.mapStruct.UserVoMapper;
 import com.zyq.bloggy.mapper.UserMapper;
-import com.zyq.bloggy.pojo.Code;
-import com.zyq.bloggy.pojo.Role;
-import com.zyq.bloggy.pojo.Status;
-import com.zyq.bloggy.pojo.User;
+import com.zyq.bloggy.model.entity.Code;
+import com.zyq.bloggy.model.entity.Role;
+import com.zyq.bloggy.model.entity.Status;
+import com.zyq.bloggy.model.pojo.User;
 import com.zyq.bloggy.serivce.UserService;
 import com.zyq.bloggy.util.StringUtils;
-import com.zyq.bloggy.vo.UserStateVo;
-import com.zyq.bloggy.vo.UserVo;
+import com.zyq.bloggy.model.vo.UserStateVo;
+import com.zyq.bloggy.model.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -40,12 +43,15 @@ public class UserServiceImpl implements UserService {
     UserVoMapper userVoMapper;
     @Autowired
     RedisTemplate redisTemplate;
+    //存储用户角色的键，时间为600秒
+    private static final String KEY_USER_ROLE = "user:role#600";
 
     @Override
     public UserVo login(String account, String password) {
+        account = account.trim();
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getPassword, DigestUtils.md5Hex(password)).eq(User::getStatus, Status.ACTIVE.getCode());
-        if ("@".indexOf(account) != -1) {
+        if (StringUtils.isEmail(account)) {
             wrapper.eq(User::getEmail, account);
         } else {
             wrapper.eq(User::getUsername, account);
@@ -55,12 +61,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean closeAccount(Long id) {
-        return userMapper.update(null, new LambdaUpdateWrapper<User>().eq(User::getId, id).set(User::getStatus, Status.INACTIVE.getCode())) > 0;
+        return userMapper.update(null, new LambdaUpdateWrapper<User>().eq(User::getId, id).eq(User::getRole, Role.MEMBER.getCode()).set(User::getStatus, Status.INACTIVE.getCode())) > 0;
     }
 
     @Override
     public User updateProfile(User user) {
-        Long userId = StpUtil.getLoginIdAsLong();
         LambdaUpdateWrapper<User> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         if (!user.getNickname().isEmpty()) {
             lambdaUpdateWrapper.set(User::getNickname, user.getNickname());
@@ -68,7 +73,7 @@ public class UserServiceImpl implements UserService {
         if (!user.getAvatar().isEmpty()) {
             lambdaUpdateWrapper.set(User::getAvatar, user.getAvatar());
         }
-        userMapper.update(user, lambdaUpdateWrapper.eq(User::getId, userId));
+        userMapper.update(user, lambdaUpdateWrapper.eq(User::getId, user.getId()));
         return user;
     }
 
@@ -78,9 +83,18 @@ public class UserServiceImpl implements UserService {
         if (StringUtils.isAnyBlank(user.getUsername(), user.getPassword(), user.getEmail())) {
             throw new BusinessException("请先完善信息");
         }
+        if (!StringUtils.isEmail(user.getEmail())) {
+            throw new BusinessException("请输入合法的邮箱");
+        }
+        if (StringUtils.isEmail(user.getUsername())) {
+            throw new BusinessException("请勿使用非法字符作为用户名");
+        }
         if (checkUsernameIsUsed(user.getUsername()) || checkEmailIsUsed(user.getEmail())) {
             throw new BusinessException("该用户名或邮箱已被使用，请更换");
         }
+        user.setUsername(user.getUsername().trim());
+        user.setPassword(user.getPassword().trim());
+        user.setEmail(user.getEmail().trim());
         user.setPassword(DigestUtils.md5Hex(user.getPassword()));
         return user;
     }
@@ -146,26 +160,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserVo> getUser(Integer page) {
-        if (page < 0) {
-            throw new BusinessException("数字不合法,页数不可小于0");
-        }
+    public Page<User> getUser(Integer page) {
+        page = page < 1 ? 1 : page;
         int pageSize = 15;
         int current = (page - 1) * pageSize;
-        int size = page * pageSize;
-        Page<User> userPage = userMapper.selectPage(new Page<User>(current, size), null);
-        return (Page<UserVo>) userPage.convert(user -> userVoMapper.toVO(user));
+        Page<User> userPage = new Page<>();
+        userPage.setTotal(userMapper.selectCount(null));
+        userPage.setRecords(userMapper.getUserList(current, pageSize));
+        return userPage;
+
     }
 
     @Override
+    @Cacheable(cacheNames = KEY_USER_ROLE, key = "#id")
     public Integer getRole(Long id) {
         return userMapper.selectById(id).getRole();
     }
 
-    @Override
-    public UserStateVo getUserStats(Long id) {
-        return userMapper.getUserStateById(id);
-    }
 
     @Override
     public boolean checkUsernameIsUsed(String username) {

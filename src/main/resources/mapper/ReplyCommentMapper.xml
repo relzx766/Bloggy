@@ -19,7 +19,7 @@
     <insert id="addLike">
         insert into tb_reply_comment_like(user_id, comment_id, create_time)
         select
-        temp2.fromId, toId, create_time
+        temp2.fromId,temp2.toId, temp2.create_time
         from
         (select temp.fromId,temp.toId,temp.create_time
         from(
@@ -29,8 +29,7 @@
         )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_article_comment as tac on
         tac.article_comment_id=temp.toId
         where tu.id is not null and tac.article_comment_id is not null)as temp2
-        left join tb_reply_comment_like trcl on trcl.user_id=temp2.fromId and trcl.comment_id=temp2.toId where
-        trcl.user_id is null
+
     </insert>
     <update id="updateLikeNum">
         update tb_reply_comment
@@ -46,18 +45,21 @@
         )
     </delete>
     <select id="getByArtCommentId" resultMap="com.zyq.bloggy.mapper.ArticleCommentMapper.baseCommentMap">
-        select trc.reply_comment_id as reply_id,
+        select trc.reply_comment_id                  as reply_id,
                trc.content,
                trc.like_num,
                trc.create_time,
-               tu.id                as user_id,
+               tu.id                                 as user_id,
                tu.username,
                tu.nickname,
                tu.avatar,
-               trc.comment_id
+               trc.comment_id,
+               if(ISNULL(trcl.user_id), false, true) as is_like
         from tb_reply_comment trc
                  join tb_user tu on trc.user_id = tu.id
                  join tb_article_comment tac on tac.article_comment_id = trc.comment_id
+                 left join tb_reply_comment_like trcl
+                           on trcl.comment_id = trc.reply_comment_id and trcl.user_id = #{userId}
         where trc.comment_id = #{id}
     </select>
     <select id="getByCommentIdLimited" resultMap="com.zyq.bloggy.mapper.ArticleCommentMapper.baseCommentMap">

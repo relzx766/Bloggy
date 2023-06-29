@@ -1,6 +1,7 @@
-package com.zyq.bloggy.pojo;
+package com.zyq.bloggy.model.pojo;
 
 import com.baomidou.mybatisplus.annotation.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,10 +16,11 @@ public class User {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     private String username;
-    @TableField(value = "passwd")
+    @TableField(value = "passwd", select = false)
     private String password;
     private String nickname;
     private String avatar;
+    @Email
     private String email;
     private Integer role;
     @TableLogic
