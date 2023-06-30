@@ -27,6 +27,7 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,7 @@ public class ArticleServiceImpl implements ArticleService {
     RedisTemplate redisTemplate;
     @Autowired
     RedisService redisService;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String KEY_ARTICLE_LIKE_COUNT = "count:like:article";
     private static final String KEY_ARTICLE_LIKE = "like:article";
     private static final String KEY_ARTICLE_COMMENT_COUNT = "count:article:comment";
@@ -248,7 +250,9 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Scheduled(cron = "* */20 * * * *")
     public void updateTrend() {
+        log.info("定时任务--更新热门--开始...");
         ValueOperations<String, Integer> operations = redisTemplate.opsForValue();
         Set<String> keys = redisTemplate.keys(KEY_ARTICLE_TREND_COUNT + "*");
         if (keys.size() < 1) {
@@ -276,6 +280,7 @@ public class ArticleServiceImpl implements ArticleService {
             return articleVo;
         }).collect(Collectors.toList());
         redisTemplate.opsForValue().set(KEY_ARTICLE_TREND, articleVos);
+        log.info("定时任务--更新热门--结束...");
     }
 
     @Override
@@ -323,7 +328,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Transactional
+    @Scheduled(cron = "0 */2 * * * *")
     public void saveLikeToDB() {
+        log.info("{} 定时任务--保存文章点赞信息--开始...", dateFormat.format(System.currentTimeMillis()));
         Map<Long, List<ThumbsUp>> like = redisService.getLike(KEY_ARTICLE_LIKE);
         Map<Long, List<ThumbsUp>> cancel = redisService.getCancelLike(KEY_ARTICLE_LIKE);
         like.forEach((articleId, thumbs) -> {
@@ -334,6 +341,9 @@ public class ArticleServiceImpl implements ArticleService {
             int countOfCancelLike = articleMapper.delLike(thumbs);
             updateDBLikeNum(articleId, -countOfCancelLike);
         });
+        log.info("{} 定时任务--保存文章点赞信息--结束...", dateFormat.format(System.currentTimeMillis()));
+
+
     }
 
     @Override
@@ -343,7 +353,9 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Scheduled(cron = "0 */2 * * * *")
     public void updateCommentNum() {
+        log.info("{} 定时任务--更新文章评论数量--开始...", dateFormat.format(System.currentTimeMillis()));
         HashOperations<String, String, Object> operations = redisTemplate.opsForHash();
         operations.keys(KEY_ARTICLE_COMMENT_COUNT + ":*").stream()
                 .forEach(key -> {
@@ -353,10 +365,13 @@ public class ArticleServiceImpl implements ArticleService {
                     articleMapper.updateCommentNum(articleId, num);
                     redisTemplate.delete(k);
                 });
+        log.info("{} 定时任务--更新文章评论数量--结束...", dateFormat.format(System.currentTimeMillis()));
     }
 
     @Override
+    @Scheduled(cron = "0 */5 * * * *")
     public void decrementTrend() {
+        log.info("{} 定时任务--消减热度值--开始...", dateFormat.format(System.currentTimeMillis()));
         ValueOperations<String, Integer> operations = redisTemplate.opsForValue();
         redisTemplate.keys(KEY_ARTICLE_TREND_COUNT + "*")
                 .forEach(key -> {
@@ -366,16 +381,19 @@ public class ArticleServiceImpl implements ArticleService {
                         redisTemplate.delete(key);
                     }
                 });
+        log.info("{} 定时任务--消减热度值--结束...", dateFormat.format(System.currentTimeMillis()));
     }
 
     @Override
+    @Scheduled(cron = "0 */4 * * * *")
     public void updateDBView() {
+        log.info("{} 定时任务--保存文章点击信息--开始...", dateFormat.format(System.currentTimeMillis()));
         BoundHashOperations<String, String, Integer> hashOperations = redisTemplate.boundHashOps(KEY_ARTICLE_VIEW_COUNT);
-        log.info("article updateByUserId view to db start------");
+
         hashOperations.keys().stream().forEach(key -> {
             articleMapper.updateViewNum(Long.valueOf(key), hashOperations.get(key));
             hashOperations.delete(key);
         });
-        log.info("------article updateByUserId view to db end");
+        log.info("{} 定时任务--保存文章点击信息--结束...", dateFormat.format(System.currentTimeMillis()));
     }
 }
