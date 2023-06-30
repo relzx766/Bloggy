@@ -1,5 +1,5 @@
 # Bloggy
-springboot vue blog 博客
+用springboot+vue实现的博客系统
 ## 登录页
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/e1c22e2e-5514-420a-ac2e-bcd258b5b96f)
 ## 注册页
