@@ -21,9 +21,11 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +45,7 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     RedisService redisService;
     @Autowired
     RedisTemplate redisTemplate;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String KEY_REPLY_LIKE_COUNT = "count:like:reply";
     private static final String KEY_REPLY_LIKE = "like:reply";
     private static final String KEY_ARTICLE_COMMENT_COUNT = "count:comment:article";
@@ -120,7 +123,9 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     }
 
     @Override
+    @Scheduled(cron = "0 */2 * * * *")
     public void saveLikeToDB() {
+        log.info("{} 定时任务--保存二级评论点赞信息--开始...", dateFormat.format(System.currentTimeMillis()));
         Map<Long, List<ThumbsUp>> like = redisService.getLike(KEY_REPLY_LIKE);
         Map<Long, List<ThumbsUp>> cancel = redisService.getCancelLike(KEY_REPLY_LIKE);
         like.forEach((replyId, thumbs) -> {
@@ -131,6 +136,7 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
             int countOfCancelLike = replyCommentMapper.delLike(thumbs);
             updateLikeNum(replyId, -countOfCancelLike);
         });
+        log.info("{} 定时任务--保存二级评论点赞信息--结束...", dateFormat.format(System.currentTimeMillis()));
     }
 
     @Override
