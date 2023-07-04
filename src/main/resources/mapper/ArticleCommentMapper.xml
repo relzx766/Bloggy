@@ -12,18 +12,20 @@
         <result property="replyId" column="reply_id"/>
         <result property="createTime" column="create_time"/>
         <result property="isLike" column="is_like"/>
+        <result property="type" column="type"/>
     </resultMap>
     <insert id="addComment">
         insert into tb_article_comment(article_comment_id, article_id, user_id, content, like_num, create_time, status)
-        SELECT #{id},
-               #{articleId},
-               #{userId},
-               #{content},
-               #{likeNum},
-               #{createTime},
-               #{status}
-        where exists(select id from tb_article where id = #{articleId})
-          and exists(select id from tb_user where id = #{userId})
+        select temp.id, a_id, u_id, c, l, ct, s
+        from (SELECT #{id}         as id,
+                     #{articleId}  as a_id,
+                     #{userId}     as u_id,
+                     #{content}    as c,
+                     #{likeNum}    as l,
+                     #{createTime} as ct,
+                     #{status}     as s) temp
+                 join tb_article ta on ta.id = #{articleId}
+                 join tb_user tu on tu.id = #{userId}
     </insert>
     <insert id="addLike">
         <!--        insert into tb_article_comment_like(user_id, comment_id, create_time)
@@ -49,6 +51,8 @@
         )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_article_comment as tac on
         tac.article_comment_id=temp.toId
         where tu.id is not null and tac.article_comment_id is not null)as temp2
+        left join tb_article_comment_like tacl on tacl.user_id=temp2.fromId and tacl.comment_id=temp2.toId where
+        tacl.user_id is null
     </insert>
     <update id="updateLikeNumInt">
         update tb_article_comment

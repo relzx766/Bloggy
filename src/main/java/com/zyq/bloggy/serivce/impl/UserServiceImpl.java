@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @CachePut(cacheNames = "reg", key = "#user.email")
+    @CachePut(cacheNames = "reg#43200", key = "#user.email")
     public User regBeforeVerify(User user) {
         if (StringUtils.isAnyBlank(user.getUsername(), user.getPassword(), user.getEmail())) {
             throw new BusinessException("请先完善信息");

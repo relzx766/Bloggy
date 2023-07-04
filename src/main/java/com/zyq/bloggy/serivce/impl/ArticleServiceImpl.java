@@ -27,6 +27,7 @@ import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +59,7 @@ public class ArticleServiceImpl implements ArticleService {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String KEY_ARTICLE_LIKE_COUNT = "count:like:article";
     private static final String KEY_ARTICLE_LIKE = "like:article";
-    private static final String KEY_ARTICLE_COMMENT_COUNT = "count:article:comment";
+    private static final String KEY_ARTICLE_COMMENT_COUNT = "count:comment:article";
     private static final String KEY_ARTICLE_VIEW_COUNT = "count:article:view";
     private static final String KEY_ARTICLE_TREND_COUNT = "count:article:trend";
     private static final String KEY_ARTICLE_TREND = "trend:article";
@@ -250,7 +251,8 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    @Scheduled(cron = "* */20 * * * *")
+    @Async
+    @Scheduled(cron = "0 */20 * * * *")
     public void updateTrend() {
         log.info("定时任务--更新热门--开始...");
         ValueOperations<String, Integer> operations = redisTemplate.opsForValue();
@@ -328,18 +330,23 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Transactional
+    @Async
     @Scheduled(cron = "0 */2 * * * *")
     public void saveLikeToDB() {
         log.info("{} 定时任务--保存文章点赞信息--开始...", dateFormat.format(System.currentTimeMillis()));
         Map<Long, List<ThumbsUp>> like = redisService.getLike(KEY_ARTICLE_LIKE);
         Map<Long, List<ThumbsUp>> cancel = redisService.getCancelLike(KEY_ARTICLE_LIKE);
         like.forEach((articleId, thumbs) -> {
-            int countOfNewLike = articleMapper.addLike(thumbs);
-            updateDBLikeNum(articleId, countOfNewLike);
+            if (thumbs.size() > 0) {
+                int countOfNewLike = articleMapper.addLike(thumbs);
+                updateDBLikeNum(articleId, countOfNewLike);
+            }
         });
         cancel.forEach((articleId, thumbs) -> {
-            int countOfCancelLike = articleMapper.delLike(thumbs);
-            updateDBLikeNum(articleId, -countOfCancelLike);
+            if (thumbs.size() > 0) {
+                int countOfCancelLike = articleMapper.delLike(thumbs);
+                updateDBLikeNum(articleId, -countOfCancelLike);
+            }
         });
         log.info("{} 定时任务--保存文章点赞信息--结束...", dateFormat.format(System.currentTimeMillis()));
 
@@ -353,11 +360,12 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Async
     @Scheduled(cron = "0 */2 * * * *")
     public void updateCommentNum() {
         log.info("{} 定时任务--更新文章评论数量--开始...", dateFormat.format(System.currentTimeMillis()));
         HashOperations<String, String, Object> operations = redisTemplate.opsForHash();
-        operations.keys(KEY_ARTICLE_COMMENT_COUNT + ":*").stream()
+        redisTemplate.keys(KEY_ARTICLE_COMMENT_COUNT + ":*").stream()
                 .forEach(key -> {
                     String k = String.valueOf(key);
                     Long articleId = Long.valueOf((String) operations.get(k, "articleId"));
@@ -369,6 +377,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Async
     @Scheduled(cron = "0 */5 * * * *")
     public void decrementTrend() {
         log.info("{} 定时任务--消减热度值--开始...", dateFormat.format(System.currentTimeMillis()));
@@ -385,6 +394,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Async
     @Scheduled(cron = "0 */4 * * * *")
     public void updateDBView() {
         log.info("{} 定时任务--保存文章点击信息--开始...", dateFormat.format(System.currentTimeMillis()));

@@ -11,6 +11,8 @@ import com.zyq.bloggy.util.TimeUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.BoundHashOperations;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.io.FileNotFoundException;
@@ -45,7 +47,8 @@ class BloggyApplicationTests {
 
     @Test
     void contextLoads() throws FileNotFoundException {
-        System.out.println(articleService.getPageList(1));
+        BoundHashOperations<String, String, Object> operations = redisTemplate.boundHashOps("count:comment:article");
+        System.out.println(redisTemplate.keys("count:comment:article*"));
 
     }
 

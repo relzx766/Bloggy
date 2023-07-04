@@ -62,7 +62,7 @@ public class TrendCounterAspect {
             if (Objects.isNull(operations.get(key))) {
                 operations.set(key, 1, 3, TimeUnit.DAYS);
             } else {
-                operations.increment(key, +1);
+                operations.increment(key, 1);
             }
             return result;
         } catch (BusinessException e) {

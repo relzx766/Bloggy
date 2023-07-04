@@ -5,16 +5,24 @@
     <insert id="addComment">
         insert into tb_reply_comment(reply_comment_id, comment_id, type, content, user_id, like_num, status,
                                      create_time)
-        SELECT #{id},
-               #{commentId},
-               #{type},
-               #{content},
-               #{userId},
-               #{likeNum},
-               #{status},
-               #{createTime}
-        where exists(select article_comment_id from tb_article_comment where article_comment_id = #{commentId})
-          and exists(select id from tb_user where id = #{userId})
+        select temp.id,
+               c_id,
+               t,
+               c,
+               u_id,
+               l,
+               s,
+               ct
+        from (SELECT #{id}         as id,
+                     #{commentId}  as c_id,
+                     #{type}       as t,
+                     #{content}    as c,
+                     #{userId}     as u_id,
+                     #{likeNum}    as l,
+                     #{status}     as s,
+                     #{createTime} as ct) temp
+                 join tb_article_comment tac on tac.article_comment_id = #{commentId}
+                 join tb_user tu on tu.id = #{userId}
     </insert>
     <insert id="addLike">
         insert into tb_reply_comment_like(user_id, comment_id, create_time)
@@ -26,10 +34,11 @@
         <foreach collection="thumbs" item="item" separator="union">
             select #{item.fromId} as fromId,#{item.toId} as toId,#{item.createTime} as create_time
         </foreach>
-        )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_article_comment as tac on
-        tac.article_comment_id=temp.toId
-        where tu.id is not null and tac.article_comment_id is not null)as temp2
-
+        )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_reply_comment as trcl on
+        trcl.reply_comment_id=temp.toId
+        where tu.id is not null and trcl.reply_comment_id is not null)as temp2
+        left join tb_reply_comment_like trcl on trcl.user_id=temp2.fromId and trcl.comment_id=temp2.toId where
+        trcl.user_id is null
     </insert>
     <update id="updateLikeNum">
         update tb_reply_comment
@@ -48,6 +57,7 @@
         select trc.reply_comment_id                  as reply_id,
                trc.content,
                trc.like_num,
+               trc.type,
                trc.create_time,
                tu.id                                 as user_id,
                tu.username,

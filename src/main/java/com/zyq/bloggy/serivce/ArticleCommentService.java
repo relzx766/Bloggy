@@ -31,6 +31,7 @@ public interface ArticleCommentService {
 
     void saveLikeToDB();
 
+
     void updateLikeNum(long id, int num);
 
     boolean getIsLiked(Long userId, Long commentId);

@@ -65,6 +65,7 @@ public interface ArticleService {
 
     List<ArticleVo> getTrend();
 
+
     void addView(Long id);
 
     void like(ThumbsUp thumbs);

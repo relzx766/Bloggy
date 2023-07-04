@@ -23,6 +23,7 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -143,6 +144,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
     }
 
     @Override
+    @Async
     @Scheduled(cron = "0 */2 * * * *")
     public void saveLikeToDB() {
         log.info("{} 定时任务--保存一级评论点赞信息--开始...", dateFormat.format(System.currentTimeMillis()));

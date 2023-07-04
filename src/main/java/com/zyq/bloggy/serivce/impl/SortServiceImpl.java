@@ -29,7 +29,7 @@ import java.util.Objects;
 public class SortServiceImpl implements SortService {
     @Autowired
     SortMapper sortMapper;
-    private static final String DEFAULT_COVER = "/default/cover.png";
+    private static final String DEFAULT_COVER = "http://localhost:8080/default/cover.png";
 
     @Override
     public Sort addSort(Sort sort) {

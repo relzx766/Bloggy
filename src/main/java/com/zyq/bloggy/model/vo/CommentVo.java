@@ -20,5 +20,6 @@ public class CommentVo {
     private Boolean isLike;
     private String replyId;
     private Integer likeNum;
+    private Integer type;
 
 }
