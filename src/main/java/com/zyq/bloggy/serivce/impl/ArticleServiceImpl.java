@@ -2,9 +2,9 @@ package com.zyq.bloggy.serivce.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zyq.bloggy.annotation.TaskInfo;
 import com.zyq.bloggy.annotation.TrendCounter;
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.mapStruct.ArticleVoMapper;
@@ -65,6 +65,7 @@ public class ArticleServiceImpl implements ArticleService {
     private static final String KEY_ARTICLE_TREND = "trend:article";
     private static final String KEY_ARTICLE_IS_LIKE = "isLike:article";
     private static final String KEY_ADMIN_ARTICLE_PAGE = "admin:article:page#30";
+    private static final String KEY_ARTICLE_ACTIVE_COUNT = "count:article:active#60";
 
     @Override
     public Article publish(Article article) {
@@ -201,6 +202,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    @Cacheable(cacheNames = KEY_ARTICLE_ACTIVE_COUNT)
     public int getActiveCount() {
         return Math.toIntExact(articleMapper.selectCount(new LambdaQueryWrapper<Article>().eq(Article::getStatus, Status.ACTIVE.getCode())));
     }
@@ -253,8 +255,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Async
     @Scheduled(cron = "0 */20 * * * *")
+    @TaskInfo(group = "article", value = "update trend", description = "更新文章热门信息")
     public void updateTrend() {
-        log.info("定时任务--更新热门--开始...");
         ValueOperations<String, Integer> operations = redisTemplate.opsForValue();
         Set<String> keys = redisTemplate.keys(KEY_ARTICLE_TREND_COUNT + "*");
         if (keys.size() < 1) {
@@ -282,7 +284,6 @@ public class ArticleServiceImpl implements ArticleService {
             return articleVo;
         }).collect(Collectors.toList());
         redisTemplate.opsForValue().set(KEY_ARTICLE_TREND, articleVos);
-        log.info("定时任务--更新热门--结束...");
     }
 
     @Override
@@ -332,8 +333,8 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional
     @Async
     @Scheduled(cron = "0 */2 * * * *")
+    @TaskInfo(group = "article", value = "update like", description = "更新文章点赞信息")
     public void saveLikeToDB() {
-        log.info("{} 定时任务--保存文章点赞信息--开始...", dateFormat.format(System.currentTimeMillis()));
         Map<Long, List<ThumbsUp>> like = redisService.getLike(KEY_ARTICLE_LIKE);
         Map<Long, List<ThumbsUp>> cancel = redisService.getCancelLike(KEY_ARTICLE_LIKE);
         like.forEach((articleId, thumbs) -> {
@@ -348,9 +349,6 @@ public class ArticleServiceImpl implements ArticleService {
                 updateDBLikeNum(articleId, -countOfCancelLike);
             }
         });
-        log.info("{} 定时任务--保存文章点赞信息--结束...", dateFormat.format(System.currentTimeMillis()));
-
-
     }
 
     @Override
@@ -361,9 +359,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Async
-    @Scheduled(cron = "0 */2 * * * *")
+    @Scheduled(cron = "0 */3 * * * *")
+    @TaskInfo(group = "article", value = "update comment number", description = "更新文章评论信息")
     public void updateCommentNum() {
-        log.info("{} 定时任务--更新文章评论数量--开始...", dateFormat.format(System.currentTimeMillis()));
         HashOperations<String, String, Object> operations = redisTemplate.opsForHash();
         redisTemplate.keys(KEY_ARTICLE_COMMENT_COUNT + ":*").stream()
                 .forEach(key -> {
@@ -371,16 +369,15 @@ public class ArticleServiceImpl implements ArticleService {
                     Long articleId = Long.valueOf((String) operations.get(k, "articleId"));
                     int num = (int) operations.get(k, "count");
                     articleMapper.updateCommentNum(articleId, num);
-                    redisTemplate.delete(k);
+                    redisTemplate.delete(key);
                 });
-        log.info("{} 定时任务--更新文章评论数量--结束...", dateFormat.format(System.currentTimeMillis()));
     }
 
     @Override
     @Async
     @Scheduled(cron = "0 */5 * * * *")
+    @TaskInfo(group = "article", value = "decrement trend weight", description = "消减文章热度值")
     public void decrementTrend() {
-        log.info("{} 定时任务--消减热度值--开始...", dateFormat.format(System.currentTimeMillis()));
         ValueOperations<String, Integer> operations = redisTemplate.opsForValue();
         redisTemplate.keys(KEY_ARTICLE_TREND_COUNT + "*")
                 .forEach(key -> {
@@ -390,20 +387,18 @@ public class ArticleServiceImpl implements ArticleService {
                         redisTemplate.delete(key);
                     }
                 });
-        log.info("{} 定时任务--消减热度值--结束...", dateFormat.format(System.currentTimeMillis()));
     }
 
     @Override
     @Async
     @Scheduled(cron = "0 */4 * * * *")
+    @TaskInfo(group = "article", value = "update views", description = "更新文章点击信息")
     public void updateDBView() {
-        log.info("{} 定时任务--保存文章点击信息--开始...", dateFormat.format(System.currentTimeMillis()));
         BoundHashOperations<String, String, Integer> hashOperations = redisTemplate.boundHashOps(KEY_ARTICLE_VIEW_COUNT);
 
         hashOperations.keys().stream().forEach(key -> {
             articleMapper.updateViewNum(Long.valueOf(key), hashOperations.get(key));
             hashOperations.delete(key);
         });
-        log.info("{} 定时任务--保存文章点击信息--结束...", dateFormat.format(System.currentTimeMillis()));
     }
 }

@@ -61,12 +61,6 @@ spring:
             port: 465
             class: javax.net.ssl.SSLSocketFactory
             fallback: false
-  devtools:
-    restart:
-      enabled: true
-      additional-paths: src/main/java
-    freemarker:
-      cache: false
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

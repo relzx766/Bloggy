@@ -7,6 +7,10 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Log {
+public @interface TaskInfo {
+    String group() default "";
 
+    String value() default "";
+
+    String description() default "";
 }

@@ -2,7 +2,6 @@ package com.zyq.bloggy.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -29,5 +28,10 @@ public class TimeUtil {
             throw new RuntimeException(e);
         }
         return cal.getTimeInMillis();
+    }
+
+    public static String getDateString(Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh-MM-ss");
+        return dateFormat.format(date);
     }
 }

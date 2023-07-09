@@ -115,7 +115,7 @@
         tu.nickname,
         tu.avatar
         from tb_article ta join tb_user tu on ta.author = tu.id
-        where json_contains(tags,json_array(
+        where ta.status=1 and json_contains(tags,json_array(
         <foreach collection="tags" item="tag" separator=",">
             #{tag}
         </foreach>
@@ -222,7 +222,7 @@
         select
         count(id)
         from tb_article
-        where json_contains(tags,json_array(
+        where status=1 and json_contains(tags,json_array(
         <foreach collection="tags" item="tag" separator=",">
             #{tag}
         </foreach>

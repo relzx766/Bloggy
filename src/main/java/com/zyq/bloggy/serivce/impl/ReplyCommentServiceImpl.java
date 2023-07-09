@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zyq.bloggy.annotation.TaskInfo;
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.mapStruct.CommentVoMapper;
 import com.zyq.bloggy.mapper.ReplyCommentMapper;
@@ -126,8 +127,8 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     @Override
     @Async
     @Scheduled(cron = "0 */2 * * * *")
+    @TaskInfo(group = "replyComment", value = "update like", description = "更新二级评论点赞信息")
     public void saveLikeToDB() {
-        log.info("{} 定时任务--保存二级评论点赞信息--开始...", dateFormat.format(System.currentTimeMillis()));
         Map<Long, List<ThumbsUp>> like = redisService.getLike(KEY_REPLY_LIKE);
         Map<Long, List<ThumbsUp>> cancel = redisService.getCancelLike(KEY_REPLY_LIKE);
         like.forEach((replyId, thumbs) -> {
@@ -142,7 +143,6 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
                 updateLikeNum(replyId, -countOfCancelLike);
             }
         });
-        log.info("{} 定时任务--保存二级评论点赞信息--结束...", dateFormat.format(System.currentTimeMillis()));
     }
 
     @Override

@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zyq.bloggy.annotation.TaskInfo;
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.mapStruct.CommentVoMapper;
 import com.zyq.bloggy.mapper.ArticleCommentMapper;
@@ -146,8 +147,8 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
     @Override
     @Async
     @Scheduled(cron = "0 */2 * * * *")
+    @TaskInfo(group = "articleComment", value = "save like", description = "保存一级评论点赞消息")
     public void saveLikeToDB() {
-        log.info("{} 定时任务--保存一级评论点赞信息--开始...", dateFormat.format(System.currentTimeMillis()));
         Map<Long, List<ThumbsUp>> like = redisService.getLike(KEY_COMMENT_LIKE);
         Map<Long, List<ThumbsUp>> cancel = redisService.getCancelLike(KEY_COMMENT_LIKE);
         like.forEach((commentId, thumbs) -> {
@@ -163,7 +164,6 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
                 updateLikeNum(commentId, -countOfCancelLike);
             }
         });
-        log.info("{} 定时任务--保存一级评论点赞信息--结束...", dateFormat.format(System.currentTimeMillis()));
 
     }
 
