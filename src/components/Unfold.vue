@@ -1,7 +1,7 @@
 <template>
 <span style="width: 100%">
     <span v-if="data.length<maxLen">
-        <div class="content">{{data}}</div>
+        <div class="content"><span v-if="type===2" style="font-weight: bolder">回复</span> {{data}}</div>
     </span>
     <span v-else>
         <div class="content">{{showBtn?sliceStr:data}}
@@ -34,6 +34,7 @@ export default {
       type: Number,
       default: 80
     },
+    type:Number
   },
   computed: {
     sliceStr() {

@@ -11,21 +11,23 @@ export const getReply=async (id)=>{
         params:{id}
     })
 }
-export const postComment=async (id,content)=>{
+export const postComment=async (id,content,type)=>{
     return JsonPost({
         url:'/comment/article/post',
         data:{
             articleId:id,
-            content:content
+            content:content,
+            type:type
         }
     })
 }
-export const postReply=async (id,content)=>{
+export const postReply=async (id,content,type)=>{
     return JsonPost({
         url:'comment/reply/post',
         data:{
             commentId:id,
-            content:content
+            content:content,
+            type:type
         }
 
     })

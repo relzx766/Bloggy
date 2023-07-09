@@ -34,7 +34,6 @@
             <el-tab-pane label="动态" name="first"><active/></el-tab-pane>
             <el-tab-pane label="文章" name="second"><article-view :user-id="id"/></el-tab-pane>
             <el-tab-pane label="收藏" name="third">收藏</el-tab-pane>
-            <el-tab-pane label="评论" name="fourth">评论</el-tab-pane>
           </el-tabs>
         </el-col>
       </el-row>
@@ -45,7 +44,7 @@
           :close-on-click-modal="false"
           width="30%">
         <el-form ref="form" :model="editProfile" label-width="80px">
-          <el-row>
+          <el-row style="text-align:center">
             <el-upload
                 class="avatar-uploader"
                 action="#"

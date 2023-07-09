@@ -3,7 +3,7 @@
     <el-main>
       <div v-for="(article,index) in articles">
        <el-link @click.native="getNode(index)"> <div class="year" >{{article.year}}</div></el-link>
-        <el-timeline>
+        <el-timeline :reverse="true">
           <el-timeline-item
               v-for="(record,index2) in article.records" placement="top"
               :timestamp="getTime(record.createTime)">

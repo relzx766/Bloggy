@@ -90,6 +90,12 @@ export default {
     this.keyword=this.$route.query.keyword
 
  this.chooseSearchType()
+  },
+  watch:{
+    '$route'(to,from){
+      this.keyword=to.query.keyword
+      this.chooseSearchType()
+    }
   }
 }
 </script>

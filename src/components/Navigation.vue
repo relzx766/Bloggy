@@ -90,6 +90,7 @@ export default {
     },
     search(){
       this.$router.push("/search?keyword="+encodeURIComponent(this.keyword))
+      this.$forceUpdate()
     }
   },
   created() {

@@ -150,7 +150,7 @@ export default {
          * 2. 通过$refs获取: html声明ref : `<mavon-editor ref=md ></mavon-editor>，`$vm`为 `this.$refs.md`
          *
          */
-        this.$refs.md.$img2Url(pos, 'http://' + res.data.path)
+        this.$refs.md.$img2Url(pos,res.data.path)
       })
     },
     getDetail() {
@@ -177,6 +177,7 @@ export default {
     if (this.id){
       this.getDetail()
     }
+    return
     this.editor.value=this.$cookie.get("draft")
   }
 }

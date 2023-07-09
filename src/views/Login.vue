@@ -129,6 +129,7 @@ export default {
   margin-left: -180px;
   left: 50%;
   padding: 30px;
+  text-align: center;
 }
 
 .me-login-box-radius {

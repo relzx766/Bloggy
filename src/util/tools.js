@@ -2,7 +2,7 @@ import Vue from "vue";
 
 export const getCount=(num)=>{
     if (num>1000){
-        return num/1000+'k';
+        return (num/1000).toFixed(1)+'k';
     }
    return num;
 }

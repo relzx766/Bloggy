@@ -7,24 +7,27 @@
       <div id="main">
         <div id="userInfo">
           <el-card class="info-card">
-            <ul>
-              <li>
-                <el-image :fit="'cover'" style="border-radius: 50%;width: 100px;height: 100px" :src="article.userVo.avatar">
-                  <div slot="placeholder" class="image-slot">
-                    加载中<span class="dot">...</span>
-                  </div>
-                </el-image>
-              </li>
-              <li><h3>{{ article.userVo.nickname }}</h3>
-                <span>{{ '@' + article.userVo.username }}</span>
-              </li>
+            <el-row >
+              <el-col :span="12">
+                <el-row>
+                  <el-col :span="5">
+                    <el-avatar :size="100" shape="circle" :src="article.userVo.avatar"/>
+                  </el-col>
+                  <el-col :span="14" style="text-align: left">
+                    <el-row><h3>{{ article.userVo.nickname }}</h3></el-row>
+                    <el-row>{{ '@' + article.userVo.username }}</el-row>
+                  </el-col>
+                </el-row>
+              </el-col>
+              <el-col :span="12" style="text-align: right">
+                <el-button style="margin-top: 26px" type="primary" @click="changeRelation">{{
+                    relation
+                  }}
+                </el-button>
 
-            </ul>
+              </el-col>
+            </el-row>
 
-            <el-button style="float: right;margin-top: 16px" type="primary" @click="changeRelation">{{
-                relation
-              }}
-            </el-button>
           </el-card>
         </div>
         <div id="title" style="margin-bottom: 8px;text-align: center">

@@ -82,8 +82,8 @@
                 </el-col>
                 <el-col :span="15">
                   <el-row>
-                    <div @click="changeStatus(2,'回复@'+i.username,index)">
-                      <unfold :data="i.content"/>
+                    <div @click="changeStatus(2,'@'+i.username+':',index)">
+                      <unfold :data="i.content" :type="i.type"/>
                     </div>
                   </el-row>
                   <el-row style="font-size: 14px;text-align: left;margin-top: 6px;font-weight: lighter">
@@ -99,14 +99,18 @@
               </el-row>
             </div>
             <el-row>
-              <el-pagination
-                  small
-                  :hide-on-single-page="true"
-                  @current-change="handleCurrentChange"
-                  layout="prev, pager, next"
-                  :page-size="5"
-                  :total="item.reply.length">
-              </el-pagination>
+              <el-col :span="24" style="text-align: center">
+                <el-pagination
+                    small
+                    :hide-on-single-page="true"
+                    @current-change="handleCurrentChange"
+                    layout="prev, pager, next"
+                    :page-size="5"
+                    :total="item.reply.length">
+                </el-pagination>
+
+
+              </el-col>
             </el-row>
           </el-row>
         </div>
@@ -243,13 +247,13 @@ export default {
     postComment() {
       let http;
       if (this.comment.type === 0) {
-        http = postComment(this.id, this.comment.content);
+        http = postComment(this.id, this.comment.content,this.comment.type);
       } else {
         //如果type为2即为三级评论，此时将tempContent插入content头部
         if (this.comment.type === 2) {
           this.comment.content = this.comment.tempContent + this.comment.content
         }
-        http = postReply(this.comment.id, this.comment.content);
+        http = postReply(this.comment.id, this.comment.content,this.comment.type);
       }
       http.then((res) => {
         if (res.code == 2001) {
