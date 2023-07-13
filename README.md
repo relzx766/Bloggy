@@ -1,5 +1,6 @@
 # Bloggy
 用springboot+vue实现的博客系统
+后端在master，前端在app
 ## 登录页
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/e1c22e2e-5514-420a-ac2e-bcd258b5b96f)
 ## 注册页
@@ -21,6 +22,17 @@
 支持模糊查询和标签查询
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/261ad892-f973-47fa-95a9-99b7977848f1)
 ## 个人主页
-目前只做了文章历史和资料修改
-![image](https://github.com/relzx766/Bloggy/assets/81310484/62d5dd16-710b-427a-921f-641c7bed9e01)
+动态没有目前实现
+![image](https://github.com/relzx766/Bloggy/assets/81310484/c06bef49-1f87-4989-b1b5-462ca8ffd201)
+
+![image](https://github.com/relzx766/Bloggy/assets/81310484/fa337d29-4cb6-4f63-84fe-aa2d2816b117)
+## 收藏夹详情
+![image](https://github.com/relzx766/Bloggy/assets/81310484/ded09b9d-154a-4028-b573-354b2a0f8e6d)
+### 收藏文章
+![image](https://github.com/relzx766/Bloggy/assets/81310484/487a3bd0-9a6f-48be-84c6-355f1f64343a)
+
+## 系统后台
+![image](https://github.com/relzx766/Bloggy/assets/81310484/ac4e25ff-c5e2-403f-8b48-4fb783cbd5a9)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/3ebd603e-06de-4685-9a0d-1e6b379e8885)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/d266b0b5-0ca4-47ef-b736-84fc3e1901a4)
 
