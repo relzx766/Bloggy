@@ -188,7 +188,7 @@ export default {
   width: 80%;
   text-align: center;
   margin: 0 auto;
-  margin-top: 30px;
+  margin-top: 40px;
 }
 
 #title {

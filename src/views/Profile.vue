@@ -33,8 +33,11 @@
           <el-tabs v-model="activeName">
             <el-tab-pane label="动态" name="first"><active/></el-tab-pane>
             <el-tab-pane label="文章" name="second"><article-view :user-id="id"/></el-tab-pane>
-            <el-tab-pane label="收藏" name="third">收藏</el-tab-pane>
+            <el-tab-pane label="收藏" name="third"><sort/></el-tab-pane>
           </el-tabs>
+        </el-col>
+        <el-col :span="6">
+
         </el-col>
       </el-row>
       <!-- 修改个人资料弹窗 -->
@@ -80,6 +83,7 @@ import Navigation from "@/components/Navigation";
 import {getUserProfile,postProfile} from "@/api/User";
 import UserActive from "@/components/UserActive";
 import UserArticle from "@/components/UserArticle";
+import UserSort from "@/components/UserSort.vue";
 
 export default {
   name: "Profile",
@@ -153,7 +157,8 @@ export default {
     components: {
       'navigation': Navigation,
       'active':UserActive,
-      'article-view':UserArticle
+      'article-view':UserArticle,
+      'sort':UserSort
     },
     created() {
       this.id = this.$route.query.id

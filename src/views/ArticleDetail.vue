@@ -65,10 +65,36 @@
 
                 </el-button>
                 <span>{{ article.comments }}</span>
-                <el-button circle>
-                  <i class="el-icon-sort"></i>
+                <el-button circle @click="chooseSortAction">
+                  <i class="el-icon-sort" :class="{'el-icon-sort':!article.isSort,'el-icon-sorted':article.isSort}"></i>
                 </el-button></el-col>
               </el-row>
+            <el-dialog
+                title="收藏"
+                :visible.sync="dialogVisible"
+                width="20%"
+            >
+              <div>
+                <el-container>
+                  <el-main>
+                    <el-radio-group v-model="choose">
+                      <el-row v-for="item in sorts" style="margin-top: 8px">
+                        <el-radio  :label="item.id">{{item.title}}</el-radio>
+                      </el-row>
+                    </el-radio-group>
+                  </el-main>
+                  <el-footer>
+                    <el-input placeholder="新建收藏夹" v-model="sortTitle" maxlength="15">
+                      <el-button slot="append" icon="el-icon-circle-plus" @click="createSort"></el-button>
+                    </el-input>
+                  </el-footer>
+                </el-container>
+              </div>
+              <span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="appendArticleToSort">确 定</el-button>
+  </span>
+            </el-dialog>
           </div>
 
         <el-link  v-for="tag in article.tags" @click.native="searchByTag(tag)"><el-tag>{{ tag }}
@@ -94,7 +120,7 @@ import Navigation from "@/components/Navigation";
 import Unfold from "@/components/Unfold";
 import {getDate,getCount} from "@/util/tools";
 import Comment from "@/components/Comment";
-
+import {createSort,append,getByUser,cancelSort} from "@/api/Sort";
 export default {
   name: "ArticleDetail",
   data() {
@@ -104,7 +130,14 @@ export default {
       relation: '+ 关注',
       flag: 0,
       time: '',
-     type:0
+     type:0,
+      dialogVisible:false,
+      choose:String,
+      userId:String,
+      sorts:[],
+      sortTitle:'',
+      sortPlaceholder:'新建收藏夹',
+
     }
   },
   methods: {
@@ -159,6 +192,64 @@ export default {
     searchByTag(tag){
       tag='#'+tag+'#'
       this.$router.push("/search?keyword="+encodeURIComponent(tag));
+    },
+    getSorts(){
+      this.dialogVisible=true;
+      getByUser(this.userId).then((res)=>{
+        this.sorts=res.data.sorts
+      })
+    },
+    createSort(){
+      createSort(this.sortTitle).then((res)=>{
+        if (res.code===2001){
+          this.sortTitle=''
+          this.sortPlaceholder='新建收藏夹'
+          this.sorts.push(res.data.sort)
+        }else {
+          this.$notify({
+            title: "Bloggy",
+            message: res.message,
+            type: "error",
+            duration:1000
+          })
+        }
+      })
+    },
+    appendArticleToSort(){
+      append(this.choose,this.id).then((res)=>{
+        if (res.code===2001){
+          this.article.isSort=true
+          this.dialogVisible=false
+        }else {
+          this.$notify({
+            title: "Bloggy",
+            message: res.message,
+            type: "error",
+            duration:1000
+          })
+        }
+      })
+    },
+    cancelSort(){
+      cancelSort(this.id).then((res)=>{
+        if (res.code===2001){
+          this.article.isSort=false
+        }else {
+          this.$notify({
+            title: "Bloggy",
+            message: res.message,
+            type: "error",
+            duration:1000
+          })
+        }
+      })
+    },
+    chooseSortAction(){
+      if (this.article.isSort){
+        this.cancelSort()
+      }else {
+        this.getSorts()
+      }
     }
   },
   components: {
@@ -170,6 +261,9 @@ export default {
     let id = this.$route.query.id
     this.id = id
     this.getDetail(id)
+  },
+  created() {
+    this.userId=this.$cookie.get("id")
   }
 }
 </script>
@@ -273,7 +367,16 @@ span + span {
   font-size: 20px;
   visibility: hidden;
 }
-
+::v-deep .el-icon-sorted {
+  background: url('../static/images/document_fill.svg') center no-repeat;
+  font-size: 20px;
+  background-size: cover;
+}
+::v-deep .el-icon-sorted:before {
+  content: "替";
+  font-size: 20px;
+  visibility: hidden;
+}
 .el-button {
   border: none;
   margin-left: 10px;
