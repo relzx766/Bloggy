@@ -1,9 +1,11 @@
 package com.zyq.bloggy.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.zyq.bloggy.model.entity.Result;
 import com.zyq.bloggy.model.pojo.Sort;
 import com.zyq.bloggy.serivce.SortService;
 import com.zyq.bloggy.util.FileUtil;
+import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,10 +21,10 @@ public class SortController {
     SortService sortService;
 
     @PostMapping("/create")
-    public Result create(@RequestParam("cover") MultipartFile multipartFile, @RequestParam("title") String title) {
+    public Result create(@Nullable @RequestParam("cover") MultipartFile multipartFile, @Nullable @RequestParam("title") String title) {
         Sort sort = new Sort();
         sort.setTitle(title);
-        if (!multipartFile.isEmpty()) {
+        if (!FileUtil.isBlank(multipartFile)) {
             sort.setCover(FileUtil.save(multipartFile));
         }
         Map<String, Object> data = new HashMap<>();
@@ -42,39 +44,46 @@ public class SortController {
         Sort sort = new Sort();
         sort.setId(id);
         sort.setTitle(title);
-        sort.setCover(FileUtil.save(cover));
+        sort.setOwner(StpUtil.getLoginIdAsLong());
+        if (!FileUtil.isBlank(cover)) {
+            sort.setCover(FileUtil.save(cover));
+        }
         return sortService.updateSort(sort) ? Result.ok("归档更新成功") : Result.err("归档更新失败");
     }
 
     @GetMapping("/detail/{id}")
     public Result getDetail(@PathVariable("id") Integer id) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("sort", sortService.getDetail(id));
+        Map<String, Object> data = sortService.getDetail(id);
         return Result.ok(data);
     }
 
     @PostMapping("/append")
     public Result append(@RequestParam("sortId") Integer sortId,
                          @RequestParam("articleId") Long articleId) {
-        Sort sort = sortService.addArticle(sortId, articleId);
-        if (Objects.nonNull(sort)) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("sort", sort);
-            return Result.ok(data, "归档成功");
-        }
-        return Result.err("归档失败");
+        sortService.addArticle(sortId, articleId, StpUtil.getLoginIdAsLong());
+        return Result.ok("归档成功");
     }
 
     @PostMapping("/remove")
     public Result remove(@RequestParam("sortId") Integer sortId,
                          @RequestParam("articleId") Long articleId) {
-        Sort sort = sortService.delArticle(sortId, articleId);
-        if (Objects.nonNull(sort)) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("sort", sort);
-            return Result.ok(data, "移除成功");
-        }
-        return Result.err("移除失败");
+        sortService.delArticle(sortId, articleId, StpUtil.getLoginIdAsLong());
+
+        return Result.ok();
+    }
+
+    @PostMapping("/cancel")
+    public Result cancel(@RequestParam("articleId") Long articleId) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        sortService.cancelSort(articleId, userId);
+        return Result.ok();
+    }
+
+    @GetMapping("/user/{id}")
+    public Result getListOfUser(@PathVariable("id") Long userId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("sorts", sortService.getUserSort(userId));
+        return Result.ok(data);
     }
 
 }

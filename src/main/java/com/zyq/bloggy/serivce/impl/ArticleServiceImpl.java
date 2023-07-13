@@ -66,6 +66,7 @@ public class ArticleServiceImpl implements ArticleService {
     private static final String KEY_ARTICLE_IS_LIKE = "isLike:article";
     private static final String KEY_ADMIN_ARTICLE_PAGE = "admin:article:page#30";
     private static final String KEY_ARTICLE_ACTIVE_COUNT = "count:article:active#60";
+    private final int DESCRIPTION_LENGTH = 100;
 
     @Override
     public Article publish(Article article) {
@@ -81,8 +82,16 @@ public class ArticleServiceImpl implements ArticleService {
         article.setCreateTime(new Timestamp(System.currentTimeMillis()));
         article.setUpdateTime(new Timestamp(System.currentTimeMillis()));
         String content = article.getContent();
-        String description = article.getContent().substring(0,
-                content.length() > 100 ? 100 : content.length());
+        String description;
+        String imageUrl = StringUtils.getImageOfMarkdown(content);
+        int offset;
+        if (null != imageUrl && content.indexOf(imageUrl) < DESCRIPTION_LENGTH) {
+            String replace = "【图片】";
+            offset = content.indexOf(imageUrl) + imageUrl.length();
+            description = content.substring(0, offset).replace(imageUrl, replace);
+        } else {
+            description = content.substring(0, content.length() > DESCRIPTION_LENGTH ? DESCRIPTION_LENGTH : content.length());
+        }
         article.setDescription(description);
         articleMapper.addArticle(article);
         return article;
@@ -142,6 +151,11 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Article getById(Long id) {
         return articleMapper.getById(id);
+    }
+
+    @Override
+    public List<ArticleVo> getByIds(Long[] ids) {
+        return articleMapper.getByIds(ids);
     }
 
     @Override
@@ -375,7 +389,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     @Async
-    @Scheduled(cron = "0 */5 * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     @TaskInfo(group = "article", value = "decrement trend weight", description = "消减文章热度值")
     public void decrementTrend() {
         ValueOperations<String, Integer> operations = redisTemplate.opsForValue();

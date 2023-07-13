@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 public class FileUtil {
     private static final String FILE_DIRECTOR = "D:/project/Bloggy/static/";
@@ -77,5 +78,9 @@ public class FileUtil {
 
     private static String getDir() {
         return new SimpleDateFormat("yyyy-MM-dd").format(System.currentTimeMillis());
+    }
+
+    public static boolean isBlank(MultipartFile multipartFile) {
+        return Objects.isNull(multipartFile) || multipartFile.isEmpty();
     }
 }

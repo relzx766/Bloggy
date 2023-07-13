@@ -8,20 +8,14 @@
         <result property="cover" column="cover"/>
         <result property="status" column="status"/>
         <result property="createTime" column="create_time"/>
-        <collection property="articles" ofType="com.zyq.bloggy.model.pojo.Article">
-            <id property="id" column="article_id"/>
-            <result property="title" column="article_title"/>
-            <result property="views" column="views"/>
-            <result property="likeNum" column="like_num"/>
-            <result property="createTime" column="article_create_time"/>
-        </collection>
     </resultMap>
     <insert id="addArticleToSort">
         insert into tb_article_of_sort(sort_id, article_id)
-        SELECT #{sortId},
-               #{articleId}
-        where exists(select id from tb_sort where id = #{sortId})
-          and exists(select id from tb_article where id = #{articleId})
+        select s_id, a_id
+        from (SELECT #{sortId}    s_id,
+                     #{articleId} a_id) as temp
+                 join tb_sort ts on ts.id = temp.s_id and ts.owner = #{userId}
+                 join tb_article ta on ta.id = temp.a_id and ta.status = 1
     </insert>
     <delete id="delArticleFromSort">
         delete
@@ -41,21 +35,22 @@
         where id = #{id}
           and owner = #{userId}
     </delete>
-    <select id="getDetailById" resultMap="baseSortMap">
-        select ts.id,
-               ts.title,
-               ts.owner,
-               ts.cover,
-               ts.status,
-               ts.create_time,
-               ts.create_time,
-               ta.id          as article_id,
-               ta.title       as article_title,
-               ta.views,
-               ta.like_num,
-               ta.create_time as article_create_time
+    <delete id="deleteByArticleIdAndUSerId">
+        delete
+        from tb_article_of_sort
+        where article_id = #{articleId}
+          and sort_id in (select ts.id from tb_sort ts where owner = #{userId})
+    </delete>
+
+    <select id="getSortedByUserIdAndArticleId" resultType="java.lang.Integer">
+        select count(taos.article_id)
         from tb_article_of_sort taos
-                 inner join tb_article ta on taos.article_id = ta.id
-                 inner join tb_sort ts on taos.sort_id = ts.id
+                 join tb_sort ts on taos.sort_id = ts.id and ts.owner = #{userId}
+        where taos.article_id = #{articleId}
+    </select>
+    <select id="getArticleIdsBySortId" resultType="java.lang.Long">
+        select article_id
+        from tb_article_of_sort
+        where sort_id = #{id}
     </select>
 </mapper>

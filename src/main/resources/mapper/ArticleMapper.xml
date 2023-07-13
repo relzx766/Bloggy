@@ -14,6 +14,7 @@
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
         <result column="description" property="description"/>
+        <result column="is_sort" property="isSort"/>
         <association property="userVo" javaType="com.zyq.bloggy.model.vo.UserVo">
             <id column="user_id" property="id"/>
             <result property="username" column="username"/>
@@ -253,6 +254,30 @@
         select *
         from tb_article
         where id = #{id}
+    </select>
+    <select id="getByIds" resultMap="baseArticleVoMap">
+        select ta.id,
+        ta.title,
+        ta.author,
+        ta.tags,
+        ta.status,
+        ta.views,
+        ta.comments,
+        ta.like_num,
+        ta.create_time,
+        ta.update_time,
+        ta.description,
+        tu.id as user_id,
+        tu.username,
+        tu.nickname,
+        tu.avatar
+        from tb_article ta
+        join tb_user tu on ta.author = tu.id
+        where ta.status=1 and ta.id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        order by ta.id desc
     </select>
 
 </mapper>

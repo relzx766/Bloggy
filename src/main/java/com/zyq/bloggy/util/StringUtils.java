@@ -40,4 +40,20 @@ public class StringUtils {
         Matcher matcher = pattern.matcher(str);
         return matcher.matches();
     }
+
+    /**
+     * 替查找markdown里第一个图片
+     *
+     * @param content
+     * @return 存在则返回图片链接，不存在返回null
+     */
+    public static String getImageOfMarkdown(String content) {
+        String regex = "\\!\\[.*\\]\\(.+\\)";
+        Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+        Matcher matcher = pattern.matcher(content);
+        if (matcher.find()) {
+            return matcher.group(0);
+        }
+        return null;
+    }
 }

@@ -9,6 +9,7 @@ import com.zyq.bloggy.model.entity.ThumbsUp;
 import com.zyq.bloggy.model.vo.ArticleVo;
 import com.zyq.bloggy.serivce.ArticleService;
 import com.zyq.bloggy.serivce.MailService;
+import com.zyq.bloggy.serivce.SortService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,8 @@ public class ArticleController {
     ArticleService articleService;
     @Autowired
     MailService mailService;
+    @Autowired
+    SortService sortService;
 
 
     @PostMapping("/publish")
@@ -65,6 +68,7 @@ public class ArticleController {
         Long userId = StpUtil.getLoginIdAsLong();
         ArticleVo articleVo = articleService.getDetail(id);
         articleVo.setIsLike(articleService.getIsLiked(userId, id));
+        articleVo.setIsSort(sortService.getArticleIsSort(id, userId));
         data.put("article", articleVo);
         articleService.addView(id);
         return Result.ok(data);

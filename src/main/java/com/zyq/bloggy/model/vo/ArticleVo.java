@@ -28,4 +28,5 @@ public class ArticleVo {
     private Boolean isLike;
     private String description;
     private Integer trend;
+    private Boolean isSort;
 }

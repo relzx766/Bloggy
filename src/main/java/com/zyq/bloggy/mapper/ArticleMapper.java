@@ -30,6 +30,8 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     List<ArticleVo> getLimited(int current, int size);
 
+    List<ArticleVo> getByIds(Long[] ids);
+
     List<ArticleVo> getArticleLimit(int current, int size);
 
     List<ArticleVo> getByKeyword(@Param("keyword") String keyword, @Param("current") int current, @Param("size") int size);

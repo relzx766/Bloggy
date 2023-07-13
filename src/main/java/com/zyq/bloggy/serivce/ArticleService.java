@@ -28,6 +28,8 @@ public interface ArticleService {
 
     Article getById(Long id);
 
+    List<ArticleVo> getByIds(Long[] ids);
+
     /**
      * @param tags
      * @param page

@@ -15,10 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Slf4j
+
 @RestControllerAdvice
 public class AdviceController {
-    static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:MM:ss");
 
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(SaTokenException.class)
@@ -34,12 +33,12 @@ public class AdviceController {
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(Throwable.class)
     public Result ExceptionHandler(Throwable e) {
+        e = e.getCause();
         if (e instanceof BusinessException) {
             return Result.err(e.getMessage());
         } else if (e instanceof ServiceException) {
             return Result.err("服务器异常");
         } else {
-            log.error("{}服务器发生异常{}", dateFormat.format(new Date()), StringUtils.getExceptionInfo(e));
             return Result.err("服务器错误");
         }
     }

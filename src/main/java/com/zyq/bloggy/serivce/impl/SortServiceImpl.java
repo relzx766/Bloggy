@@ -7,9 +7,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zyq.bloggy.annotation.TrendCounter;
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.mapper.SortMapper;
+import com.zyq.bloggy.model.pojo.Article;
 import com.zyq.bloggy.model.pojo.Sort;
 import com.zyq.bloggy.model.entity.Status;
+import com.zyq.bloggy.model.vo.ArticleVo;
+import com.zyq.bloggy.serivce.ArticleService;
 import com.zyq.bloggy.serivce.SortService;
+import com.zyq.bloggy.util.StringUtils;
 import io.github.ms100.cacheasmulti.cache.annotation.CacheAsMulti;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +24,9 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -29,25 +35,26 @@ import java.util.Objects;
 public class SortServiceImpl implements SortService {
     @Autowired
     SortMapper sortMapper;
+    @Autowired
+    ArticleService articleService;
     private static final String DEFAULT_COVER = "http://localhost:8080/default/cover.png";
 
     @Override
     public Sort addSort(Sort sort) {
-        if (sort.getTitle().isEmpty()) {
+        if (StringUtils.isBlank(sort.getTitle())) {
             sort.setTitle("默认标题");
         }
-        if (sort.getCover().isEmpty()) {
+        if (StringUtils.isBlank(sort.getCover())) {
             sort.setCover(DEFAULT_COVER);
         }
         sort.setOwner(StpUtil.getLoginIdAsLong());
-        sort.setStatus(Status.INACTIVE.getCode());
+        sort.setStatus(Status.ACTIVE.getCode());
         sort.setCreateTime(new Timestamp(System.currentTimeMillis()));
         sortMapper.insert(sort);
         return sort;
     }
 
     @Override
-    @CacheEvict(key = "#id")
     public Boolean delSort(Integer id) {
         Long userId = StpUtil.getLoginIdAsLong();
         return sortMapper.delete(new LambdaUpdateWrapper<Sort>()
@@ -56,27 +63,27 @@ public class SortServiceImpl implements SortService {
     }
 
     @Override
-    @CachePut(key = "sort.id")
     public Boolean updateSort(Sort sort) {
-        Long userId = StpUtil.getLoginIdAsLong();
         return sortMapper.update(null, new LambdaUpdateWrapper<Sort>()
                 .set(Sort::getTitle, sort.getTitle())
                 .set(Sort::getCover, sort.getCover())
                 .eq(Sort::getId, sort.getId())
-                .eq(Sort::getOwner, userId)
+                .eq(Sort::getOwner, sort.getOwner())
                 .eq(Sort::getStatus, Status.ACTIVE.getCode())) > 0;
     }
 
     @Override
-    @TrendCounter(key = "sort")
-    @Cacheable(key = "#id")
-    public Sort getDetail(Integer id) {
-        return sortMapper.getDetailById(id);
+    public Map<String, Object> getDetail(Integer id) {
+        Map<String, Object> data = new HashMap<>();
+        Sort sort = sortMapper.selectById(id);
+        Long[] ids = sortMapper.getArticleIdsBySortId(id);
+        List<ArticleVo> articleList = articleService.getByIds(ids);
+        data.put("sort", sort);
+        data.put("articles", articleList);
+        return data;
     }
 
     @Override
-    @TrendCounter(key = "sort")
-    @Cacheable(cacheNames = "sort::user", key = "#id")
     public List<Sort> getUserSort(Long id) {
         return sortMapper.selectList(new LambdaQueryWrapper<Sort>()
                 .eq(Sort::getOwner, id)
@@ -89,36 +96,37 @@ public class SortServiceImpl implements SortService {
     }
 
     @Override
-    @CachePut(key = "#sortId")
-    public Sort addArticle(Integer sortId, Long articleId) {
+    public boolean addArticle(Integer sortId, Long articleId, long userId) {
         if (Objects.isNull(sortId) || Objects.isNull(articleId)) {
             throw new BusinessException("参数不全");
         }
-        if (sortMapper.addArticleToSort(sortId, articleId) > 0) {
-            return sortMapper.getDetailById(sortId);
-        } else {
-            return null;
-        }
+        return sortMapper.addArticleToSort(sortId, articleId, userId) > 0;
     }
 
     @Override
-    @CacheEvict
-    public Sort delArticle(Integer sortId, Long articleId) {
+    public void delArticle(Integer sortId, Long articleId, long userId) {
         if (Objects.isNull(sortId) || Objects.isNull(articleId)) {
             throw new BusinessException("参数不全");
         }
-        if (sortMapper.delArticleFromSort(sortId, articleId) > 0) {
-            return sortMapper.getDetailById(sortId);
+        if (userId != sortMapper.selectById(sortId).getOwner()) {
+            throw new BusinessException("你不是该收藏夹的拥有者");
         }
-        return null;
+        sortMapper.delArticleFromSort(sortId, articleId);
+
     }
 
     @Override
-    @CacheEvict(key = "#articleIds")
-    public Sort delArticle(Integer sortId, @CacheAsMulti Long[] articleIds) {
-        if (sortMapper.delArticlesFromSort(sortId, articleIds) > 0) {
-            return sortMapper.getDetailById(sortId);
-        }
-        return null;
+    public void delArticle(Integer sortId, @CacheAsMulti Long[] articleIds) {
+        sortMapper.delArticlesFromSort(sortId, articleIds);
+    }
+
+    @Override
+    public boolean getArticleIsSort(long articleId, long userId) {
+        return sortMapper.getSortedByUserIdAndArticleId(articleId, userId) > 0;
+    }
+
+    @Override
+    public void cancelSort(long articleId, long userId) {
+        sortMapper.deleteByArticleIdAndUSerId(articleId, userId);
     }
 }

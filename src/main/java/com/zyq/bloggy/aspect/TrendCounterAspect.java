@@ -59,8 +59,9 @@ public class TrendCounterAspect {
             }
             key = generateKeyBySPEL(key, joinPoint);
             ValueOperations<String, Integer> operations = redisTemplate.opsForValue();
+            System.out.println(operations.get(key));
             if (Objects.isNull(operations.get(key))) {
-                operations.set(key, 1, 3, TimeUnit.DAYS);
+                operations.set(key, 100, 7, TimeUnit.DAYS);
             } else {
                 operations.increment(key, 1);
             }

@@ -21,7 +21,6 @@ public class Sort {
 
     private Long owner;
     private String title;
-    private ArrayList<Article> articles;
     private String cover;
     @TableLogic
     private Integer status;

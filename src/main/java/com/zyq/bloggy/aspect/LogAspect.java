@@ -42,11 +42,19 @@ public class LogAspect {
     }
 
     @Pointcut("execution(* com.zyq.bloggy.controller.*.*(..))")
+    public void allController() {
+    }
+
+    @Pointcut("execution(* com.zyq.bloggy.controller.AdviceController.*(..))")
+    public void adviceController() {
+    }
+
+    @Pointcut("allController()&&!adviceController()")
     public void point() {
     }
 
     @Around("point()")
-    public Object doLog(ProceedingJoinPoint joinPoint) {
+    public Object doLog(ProceedingJoinPoint joinPoint) throws Exception {
         WebLog webLog = new WebLog();
         try {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
