@@ -24,16 +24,22 @@
             </el-row>
           </el-col>
           <el-col :span="11" style="text-align: right;line-height: 150px">
-            <el-button type="primary" icon="el-icon-user" @click="editProfileDialog=true">编辑个人资料</el-button>
+            <el-button v-if="currentUserId===id" type="primary" icon="el-icon-user" @click="editProfileDialog=true">编辑个人资料</el-button>
           </el-col>
         </el-row>
       </el-card>
       <el-row>
         <el-col :span="18">
           <el-tabs v-model="activeName">
-            <el-tab-pane label="动态" name="first"><active/></el-tab-pane>
-            <el-tab-pane label="文章" name="second"><article-view :user-id="id"/></el-tab-pane>
-            <el-tab-pane label="收藏" name="third"><sort/></el-tab-pane>
+            <el-tab-pane label="动态" name="first">
+              <active/>
+            </el-tab-pane>
+            <el-tab-pane label="文章" name="second">
+              <article-view :user-id="id"/>
+            </el-tab-pane>
+            <el-tab-pane label="收藏" name="third">
+              <sort :id="id"/>
+            </el-tab-pane>
           </el-tabs>
         </el-col>
         <el-col :span="6">
@@ -80,7 +86,7 @@
 
 <script>
 import Navigation from "@/components/Navigation";
-import {getUserProfile,postProfile} from "@/api/User";
+import {getUserProfile, postProfile} from "@/api/User";
 import UserActive from "@/components/UserActive";
 import UserArticle from "@/components/UserArticle";
 import UserSort from "@/components/UserSort.vue";
@@ -95,34 +101,35 @@ export default {
       editProfile: {},
       fileList: [],
       editProfileDialog: false,
+      currentUserId: ''
     }
   },
   methods: {
     getUserInfo() {
       let user = {}
-      if (this.id == this.$cookie.get("id")) {
+      if (this.id === this.currentUserId) {
         user.avatar = this.$cookie.get("avatar");
         user.username = this.$cookie.get("username");
         user.nickname = this.$cookie.get("nickname");
+        this.$set(this, 'user', user);
       } else {
         getUserProfile(this.id).then((res) => {
           user = res.data.user;
+          this.$set(this, 'user', user);
         })
-      }
-      this.$set(this, 'user', user);
-    },
+      }},
     submitProfile(fileObject) {
-      let data=new FormData();
+      let data = new FormData();
       console.log(this.fileList[0])
-      data.append("avatar",this.fileList[0].raw);
-      data.append("nickname",this.editProfile.nickname?this.editProfile.nickname:this.user.nickname)
+      data.append("avatar", this.fileList[0].raw);
+      data.append("nickname", this.editProfile.nickname ? this.editProfile.nickname : this.user.nickname)
       console.log(data.get("avatar"))
-      postProfile(data).then((res)=>{
-        this.user.nickname=res.data.user.nickname;
-        this.user.avatar=res.data.user.avatar
-        this.editProfileDialog=false
-        this.$cookie.set("nickname",this.user.nickname,24*60*60*30)
-        this.$cookie.set( "avatar",this.user.avatar,24*60*60*30)
+      postProfile(data).then((res) => {
+        this.user.nickname = res.data.user.nickname;
+        this.user.avatar = res.data.user.avatar
+        this.editProfileDialog = false
+        this.$cookie.set("nickname", this.user.nickname, 24 * 60 * 60 * 30)
+        this.$cookie.set("avatar", this.user.avatar, 24 * 60 * 60 * 30)
       })
     },
     handleChange(file, fileList) {
@@ -134,37 +141,36 @@ export default {
       this.fileList[0].url = URL.createObjectURL(file.raw)
     }
     ,
-      handleAvatarSuccess(res, file)
-      {
+    handleAvatarSuccess(res, file) {
 
-      }
-    ,
-      beforeAvatarUpload(file)
-      {
-        const isJPG = file.type === 'image/jpeg';
-        const isLt2M = file.size / 1024 / 1024 < 2;
-
-        if (!isJPG) {
-          this.$message.error('上传头像图片只能是 JPG 格式!');
-        }
-        if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 2MB!');
-        }
-        return isJPG && isLt2M;
-      }
     }
     ,
-    components: {
-      'navigation': Navigation,
-      'active':UserActive,
-      'article-view':UserArticle,
-      'sort':UserSort
-    },
-    created() {
-      this.id = this.$route.query.id
-      this.getUserInfo()
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      return isJPG && isLt2M;
     }
   }
+  ,
+  components: {
+    'navigation': Navigation,
+    'active': UserActive,
+    'article-view': UserArticle,
+    'sort': UserSort
+  },
+  created() {
+    this.currentUserId = this.$cookie.get("id")
+    this.id = this.$route.query.id
+    this.getUserInfo()
+  }
+}
 </script>
 
 <style scoped>

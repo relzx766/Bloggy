@@ -187,16 +187,14 @@ export default {
 #editor {
   width: 80%;
   text-align: center;
-  margin: 0 auto;
-  margin-top: 40px;
+  margin: 100px auto 20px;
 }
 
 #title {
   width: 80%;
   text-align: center;
-  margin: 0 auto;
   background-color: #42b983;
-  margin-top: 30px;
+  margin: 30px auto 0;
 }
 
 li {

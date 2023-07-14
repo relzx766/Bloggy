@@ -44,7 +44,7 @@
       >
         <template slot-scope="scope">
           <el-tag v-if="users[scope.$index].role===1">普通用户</el-tag>
-          <el-tag v-if="users[scope.$index].role===0">管理员</el-tag>
+          <el-tag v-if="users[scope.$index].role===0" type="danger">管理员</el-tag>
 
         </template>
       </el-table-column>

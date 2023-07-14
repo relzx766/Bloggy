@@ -89,8 +89,10 @@ export default {
       this.$router.push("/profile?id="+id)
     },
     search(){
-      this.$router.push("/search?keyword="+encodeURIComponent(this.keyword))
-      this.$forceUpdate()
+      if (this.keyword.length>0) {
+        this.$router.push("/search?keyword=" + encodeURIComponent(this.keyword))
+        this.$forceUpdate()
+      }
     }
   },
   created() {

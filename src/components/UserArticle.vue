@@ -1,6 +1,7 @@
 <template>
   <el-container>
     <el-main>
+      <el-empty description="空空如也" v-if="articles[0].year===''"></el-empty>
       <div v-for="(article,index) in articles">
        <el-link @click.native="getNode(index)"> <div class="year" >{{article.year}}</div></el-link>
         <el-timeline :reverse="true">
@@ -23,8 +24,6 @@
           </el-timeline-item>
         </el-timeline>
       </div>
-
-      <el-empty description="空空如也" v-if="articles.length<1"></el-empty>
     </el-main>
   </el-container>
 </template>
@@ -40,7 +39,12 @@ export default {
   },
   data() {
     return {
-      articles: []
+      articles: [
+        {
+          year:'',
+          records:[]
+        }
+      ]
     }
   },
   methods: {
@@ -63,10 +67,12 @@ export default {
       })
     },
     getNode(index){
-      getUserArticleByYear(this.userId,this.articles[index].year).then((res)=>{
-        this.articles[index].records=res.data.articles
-        this.$forceUpdate()
-      })
+      if (this.articles[index].year) {
+        getUserArticleByYear(this.userId, this.articles[index].year).then((res) => {
+          this.articles[index].records = res.data.articles
+          this.$forceUpdate()
+        })
+      }
     },
     del(index1,index2){
       let id=this.articles[index1].records[index2].id

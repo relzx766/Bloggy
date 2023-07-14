@@ -23,7 +23,7 @@ export const verify=async (email,code)=>{
 }
 export const getUserProfile=async (id)=>{
     return Get({
-        url:'/profile',
+        url:'/user/profile',
         params:{id}
     })
 }
@@ -31,5 +31,11 @@ export const postProfile=async (data)=>{
     return FormPost({
         url:'/user/profile/update',
         data:data
+    })
+}
+export const searchUser=async (keyword)=>{
+    return Get({
+        url:'/user/search',
+        params:{keyword}
     })
 }

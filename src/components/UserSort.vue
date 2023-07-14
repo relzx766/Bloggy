@@ -8,6 +8,7 @@
       <div>
         <el-container>
           <el-main>
+            <el-empty description="空空如也" v-if="!sorts.length>0"></el-empty>
             <el-row style="text-align:center;margin-bottom: 100px">
               <div style="width: 200px;height: 150px;border: 1px  black solid;margin: 0 auto">
                 <el-upload
@@ -40,7 +41,7 @@
   </span>
     </el-dialog>
     <el-row style="text-align: right">
-      <el-button type="primary" icon="el-icon-circle-plus" @click="()=>{addDialog=true;cover=[]}">新建收藏夹</el-button>
+      <el-button v-if="id===userId" type="primary" icon="el-icon-circle-plus" @click="()=>{addDialog=true;cover=[]}">新建收藏夹</el-button>
 
     </el-row>
 <div v-for="(sort,index) in sorts" >
@@ -112,6 +113,9 @@ import {getMonthAndDay} from "@/util/tools";
 
 export default {
   name: "UserSort",
+  props:{
+    id:String
+  },
   data(){
     return{
       userId:String,
@@ -125,7 +129,7 @@ export default {
   },
   methods:{
     getByUser(){
-      getByUser(this.userId).then((res)=>{
+      getByUser(this.id).then((res)=>{
         this.sorts=res.data.sorts
       })
     } ,  getTime(date){
