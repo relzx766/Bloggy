@@ -21,6 +21,8 @@
 ## 搜索
 支持模糊查询和标签查询
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/261ad892-f973-47fa-95a9-99b7977848f1)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/0bb13fc0-560f-4661-97b2-283b19bff9d5)
+
 ## 个人主页
 动态没有目前实现
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/c06bef49-1f87-4989-b1b5-462ca8ffd201)
@@ -30,3 +32,11 @@
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/ded09b9d-154a-4028-b573-354b2a0f8e6d)
 ### 收藏文章
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/487a3bd0-9a6f-48be-84c6-355f1f64343a)
+## 后台
+### 用户管理
+![image](https://github.com/relzx766/Bloggy/assets/81310484/43141994-d597-4a67-afbe-42f7ff7d1008)
+### 文章管理
+![image](https://github.com/relzx766/Bloggy/assets/81310484/d1e3b0c3-6963-4b73-928e-f98a605d2e7e)
+### 广告管理
+![image](https://github.com/relzx766/Bloggy/assets/81310484/968b5271-f4e8-43c7-8b6b-6676847e3eee)
+
