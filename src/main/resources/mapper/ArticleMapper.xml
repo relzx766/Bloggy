@@ -72,13 +72,18 @@
     </update>
     <update id="updateByUserId">
         update tb_article
-        set title=#{article.title},
-            content=#{article.content},
-            tags=#{article.tags,typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler},
+        <set>
+            <if test="article.title != null and article.title!=''">title=#{article.title},</if>
+            <if test="article.content != null and article.content!=''">content=#{article.content},</if>
+            <if test="article.tags != null">
+                tags=#{article.tags,typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler},
+            </if>
+            <if test="article.description!=null and article.description!=''">description=#{article.description},</if>
             update_time=#{article.updateTime}
+        </set>
         where id = #{article.id}
-          and author = #{userId}
-          and status = 1
+        and author = #{userId}
+        and status = 1
     </update>
     <update id="updateStatusById">
         update tb_article
@@ -177,6 +182,7 @@
         select count(*)
         from tb_article
         where title like CONCAT(CONCAT('%', #{keyword}), '%')
+          and status = 1
     </select>
     <select id="getIsLikeInt" resultType="java.lang.Integer">
         select count(*)

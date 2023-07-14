@@ -64,12 +64,18 @@ public class SortServiceImpl implements SortService {
 
     @Override
     public Boolean updateSort(Sort sort) {
-        return sortMapper.update(null, new LambdaUpdateWrapper<Sort>()
-                .set(Sort::getTitle, sort.getTitle())
-                .set(Sort::getCover, sort.getCover())
-                .eq(Sort::getId, sort.getId())
+        LambdaUpdateWrapper<Sort> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(Sort::getId, sort.getId())
                 .eq(Sort::getOwner, sort.getOwner())
-                .eq(Sort::getStatus, Status.ACTIVE.getCode())) > 0;
+                .eq(Sort::getStatus, Status.ACTIVE.getCode());
+        if (!StringUtils.isBlank(sort.getTitle())) {
+            wrapper.set(Sort::getTitle, sort.getTitle());
+        }
+        if (!StringUtils.isBlank(sort.getCover())) {
+            wrapper.set(Sort::getCover, sort.getCover());
+
+        }
+        return sortMapper.update(null, wrapper) > 0;
     }
 
     @Override

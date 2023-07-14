@@ -152,7 +152,6 @@ public class UserServiceImpl implements UserService {
                 .like(User::getUsername, account)
                 .or()
                 .like(User::getNickname, account)
-                .eq(User::getStatus, Status.ACTIVE)
         );
         List<UserVo> userVos = new ArrayList<>();
         userList.forEach(user -> userVos.add(userVoMapper.toVO(user)));

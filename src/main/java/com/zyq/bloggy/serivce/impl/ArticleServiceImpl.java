@@ -68,6 +68,20 @@ public class ArticleServiceImpl implements ArticleService {
     private static final String KEY_ARTICLE_ACTIVE_COUNT = "count:article:active#60";
     private final int DESCRIPTION_LENGTH = 100;
 
+    private String getDescription(String content) {
+        String description;
+        String imageUrl = StringUtils.getImageOfMarkdown(content);
+        int offset;
+        if (null != imageUrl && content.indexOf(imageUrl) < DESCRIPTION_LENGTH) {
+            String replace = "【图片】";
+            offset = content.indexOf(imageUrl) + imageUrl.length();
+            description = content.substring(0, offset).replace(imageUrl, replace);
+        } else {
+            description = content.substring(0, content.length() > DESCRIPTION_LENGTH ? DESCRIPTION_LENGTH : content.length());
+        }
+        return description;
+    }
+
     @Override
     public Article publish(Article article) {
         if (StringUtils.isAnyBlank(article.getTitle(), article.getContent())) {
@@ -82,17 +96,7 @@ public class ArticleServiceImpl implements ArticleService {
         article.setCreateTime(new Timestamp(System.currentTimeMillis()));
         article.setUpdateTime(new Timestamp(System.currentTimeMillis()));
         String content = article.getContent();
-        String description;
-        String imageUrl = StringUtils.getImageOfMarkdown(content);
-        int offset;
-        if (null != imageUrl && content.indexOf(imageUrl) < DESCRIPTION_LENGTH) {
-            String replace = "【图片】";
-            offset = content.indexOf(imageUrl) + imageUrl.length();
-            description = content.substring(0, offset).replace(imageUrl, replace);
-        } else {
-            description = content.substring(0, content.length() > DESCRIPTION_LENGTH ? DESCRIPTION_LENGTH : content.length());
-        }
-        article.setDescription(description);
+        article.setDescription(getDescription(content));
         articleMapper.addArticle(article);
         return article;
     }
@@ -129,6 +133,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (StringUtils.isAnyBlank(article.getTitle(), article.getContent())) {
             throw new BusinessException("标题和内容不能为空");
         }
+        article.setDescription(getDescription(article.getContent()));
         article.setUpdateTime(new Timestamp(System.currentTimeMillis()));
         articleMapper.updateByUserId(article, userId);
         ArticleVo articleVo = articleVoMapper.toVo(article);
