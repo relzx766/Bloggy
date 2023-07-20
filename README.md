@@ -39,4 +39,6 @@
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/d1e3b0c3-6963-4b73-928e-f98a605d2e7e)
 ### 广告管理
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/968b5271-f4e8-43c7-8b6b-6676847e3eee)
+### 仪表盘
+![image](https://github.com/relzx766/Bloggy/assets/81310484/b4922dc7-9145-4d9c-aa5f-ef0d20cd9818)
 
