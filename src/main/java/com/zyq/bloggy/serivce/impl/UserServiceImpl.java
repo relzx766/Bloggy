@@ -1,6 +1,5 @@
 package com.zyq.bloggy.serivce.impl;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,10 +11,10 @@ import com.zyq.bloggy.model.entity.Code;
 import com.zyq.bloggy.model.entity.Role;
 import com.zyq.bloggy.model.entity.Status;
 import com.zyq.bloggy.model.pojo.User;
+import com.zyq.bloggy.model.vo.UserVo;
 import com.zyq.bloggy.serivce.UserService;
 import com.zyq.bloggy.util.StringUtils;
-import com.zyq.bloggy.model.vo.UserStateVo;
-import com.zyq.bloggy.model.vo.UserVo;
+import com.zyq.bloggy.util.TimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,22 +28,22 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 @Slf4j
 @CacheConfig(cacheNames = "user")
 public class UserServiceImpl implements UserService {
+    //存储用户角色的键，时间为600秒
+    private static final String KEY_USER_ROLE = "user:role#600";
+    private static final String DEFAULT_AVATAR = "http://localhost:8080/default/logo.svg";
     @Autowired
     UserMapper userMapper;
     @Autowired
     UserVoMapper userVoMapper;
     @Autowired
     RedisTemplate redisTemplate;
-    //存储用户角色的键，时间为600秒
-    private static final String KEY_USER_ROLE = "user:role#600";
 
     @Override
     public UserVo login(String account, String password) {
@@ -100,17 +99,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<Map<String, Integer>> getUserCountByDay(Integer num) {
+        return userMapper.getCountByTime(TimeUtil.getTimestampRange(num));
+    }
+
+    @Override
     @CacheEvict(cacheNames = "reg", key = "#email")
     public Boolean register(String email) {
         User user = (User) redisTemplate.opsForValue().get("reg:" + email);
         if (StringUtils.isAnyBlank(user.getUsername(), user.getPassword(), user.getEmail())) {
             throw new ServiceException(Code.SYSTEM_ERROR.getCode(), "系统缓存出现错误");
         }
-        if (Objects.isNull(user.getRole())) {
-            user.setRole(Role.MEMBER.getCode());
-        }
-        user.setNickname("bloggy用户#" + user.getUsername());
-        user.setAvatar("http://localhost:8080/default/logo.svg");
+        user.setRole(Role.MEMBER.getCode());
+        user.setNickname(user.getUsername());
+        user.setAvatar(DEFAULT_AVATAR);
         user.setStatus(Status.ACTIVE.getCode());
         user.setRegistrationTime(new Timestamp(System.currentTimeMillis()));
         return userMapper.insert(user) > 0;
@@ -185,5 +187,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean checkEmailIsUsed(String email) {
         return Objects.nonNull(userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email)));
+    }
+
+    @Override
+    public int getUserCount() {
+        return userMapper.getCount();
+    }
+
+    @Override
+    public int getActiveUserCount() {
+        return Math.toIntExact(userMapper.selectCount(null));
     }
 }

@@ -2,20 +2,16 @@ package com.zyq.bloggy.aspect;
 
 import com.zyq.bloggy.annotation.TrendCounter;
 import com.zyq.bloggy.exception.BusinessException;
+import com.zyq.bloggy.util.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Annotation;
@@ -26,12 +22,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * 该切面可统计热度，同时也可以计算缓存权重
  */
+
 @Aspect
 @Component
 @Order(value = 10)
 public class TrendCounterAspect {
-    private SpelExpressionParser parser = new SpelExpressionParser();
-    private DefaultParameterNameDiscoverer discoverer = new DefaultParameterNameDiscoverer();
+
     @Autowired
     RedisTemplate redisTemplate;
 
@@ -57,7 +53,7 @@ public class TrendCounterAspect {
                     break;
                 }
             }
-            key = generateKeyBySPEL(key, joinPoint);
+            key = StringUtils.generateKeyBySPEL(key, joinPoint);
             ValueOperations<String, Integer> operations = redisTemplate.opsForValue();
             System.out.println(operations.get(key));
             if (Objects.isNull(operations.get(key))) {
@@ -73,15 +69,5 @@ public class TrendCounterAspect {
         }
     }
 
-    public String generateKeyBySPEL(String spELString, ProceedingJoinPoint joinPoint) {
-        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
-        String[] paramNames = discoverer.getParameterNames(methodSignature.getMethod());
-        Expression expression = parser.parseExpression(spELString);
-        EvaluationContext context = new StandardEvaluationContext();
-        Object[] args = joinPoint.getArgs();
-        for (int i = 0; i < args.length; i++) {
-            context.setVariable(paramNames[i], args[i]);
-        }
-        return expression.getValue(context).toString();
-    }
+
 }

@@ -15,6 +15,7 @@ public class FileUtil {
     private static final String VIDEO_DIRECTORY = FILE_DIRECTOR + "/video/";
     private static final String IMAGE_LOCATION = "http://localhost:8080/image/";
     private static final String VIDEO_LOCATION = "http://localhost:8080/video/";
+
     private static String[] IMAGE_TYPE = new String[]{
             ".jpg", ".png", ".JPEG", ".jfif", ".webp"
     };

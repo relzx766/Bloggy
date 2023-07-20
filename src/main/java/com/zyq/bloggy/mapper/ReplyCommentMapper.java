@@ -1,8 +1,8 @@
 package com.zyq.bloggy.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.zyq.bloggy.model.pojo.ReplyComment;
 import com.zyq.bloggy.model.entity.ThumbsUp;
+import com.zyq.bloggy.model.pojo.ReplyComment;
 import com.zyq.bloggy.model.vo.CommentVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;

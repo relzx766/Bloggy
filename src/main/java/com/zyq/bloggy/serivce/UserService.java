@@ -2,11 +2,10 @@ package com.zyq.bloggy.serivce;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zyq.bloggy.model.pojo.User;
-import com.zyq.bloggy.model.vo.UserStateVo;
 import com.zyq.bloggy.model.vo.UserVo;
-import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
     UserVo login(String account, String password);
@@ -41,4 +40,10 @@ public interface UserService {
     boolean checkUsernameIsUsed(String username);
 
     boolean checkEmailIsUsed(String email);
+
+    int getUserCount();
+
+    int getActiveUserCount();
+
+    List<Map<String, Integer>> getUserCountByDay(Integer num);
 }

@@ -1,14 +1,17 @@
 package com.zyq.bloggy.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.zyq.bloggy.model.pojo.Article;
 import com.zyq.bloggy.model.entity.ThumbsUp;
+import com.zyq.bloggy.model.pojo.Article;
 import com.zyq.bloggy.model.vo.ArticleVo;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public interface ArticleMapper extends BaseMapper<Article> {
@@ -19,6 +22,8 @@ public interface ArticleMapper extends BaseMapper<Article> {
     int updateStatusById(@Param("id") long id, @Param("status") int status);
 
     ArticleVo getDetail(@Param("articleId") long articleId);
+
+    ArticleVo getDetailForAdmin(@Param("articleId") long articleId);
 
     int addArticle(@Param("art") Article article);
 
@@ -55,4 +60,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
     List<Article> getTrend(@Param("ids") List<Long> ids);
 
     int updateCommentNum(@Param("id") long id, @Param("num") int num);
+
+    @MapKey("date")
+    List<Map<String, Integer>> getCountRangeByTime(Timestamp time);
 }

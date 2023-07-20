@@ -285,5 +285,35 @@
         </foreach>
         order by ta.id desc
     </select>
+    <select id="getDetailForAdmin" resultType="com.zyq.bloggy.model.vo.ArticleVo">
+        select ta.id,
+               ta.title,
+               ta.author,
+               ta.tags,
+               ta.status,
+               ta.views,
+               ta.comments,
+               ta.content,
+               ta.like_num,
+               ta.create_time,
+               ta.update_time,
+               ta.description,
+               tu.id as user_id,
+               tu.username,
+               tu.nickname,
+               tu.avatar
+        from tb_article ta
+                 join tb_user tu on ta.author = tu.id
+                 left join tb_like_article tla on tla.article_id = ta.id
+        where ta.id = #{articleId}
+    </select>
+    <select id="getCountRangeByTime" resultType="java.util.Map">
+        select date_format(create_time, '%Y-%m-%d') as date, count(id) as count
+        from tb_article
+        where create_time between #{time} and now()
+        group by date_format(create_time, '%Y-%m-%d')
+
+    </select>
+
 
 </mapper>

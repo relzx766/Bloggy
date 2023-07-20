@@ -5,9 +5,6 @@ import com.zyq.bloggy.model.pojo.Sort;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-
 @Repository
 public interface SortMapper extends BaseMapper<Sort> {
     int addArticleToSort(@Param("sortId") int sortId, @Param("articleId") long articleId, @Param("userId") long userId);

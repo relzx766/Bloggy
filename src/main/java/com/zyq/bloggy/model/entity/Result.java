@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -36,6 +37,39 @@ public class Result {
 
     public static Result err(String message) {
         return new Result(Code.ERR.getCode(), null, message);
+    }
+
+    public Result success(String message) {
+        this.code = Code.OK.getCode();
+        this.message = message;
+        this.data = new HashMap<>();
+        return this;
+    }
+
+    public Result success() {
+        this.code = Code.OK.getCode();
+        this.message = "ok";
+        this.data = new HashMap<>();
+        return this;
+    }
+
+    public Result error(String message) {
+        this.code = Code.ERR.getCode();
+        this.message = message;
+        this.data = new HashMap<>();
+        return this;
+    }
+
+    public Result error() {
+        this.code = Code.ERR.getCode();
+        this.message = "err";
+        this.data = new HashMap<>();
+        return this;
+    }
+
+    public Result put(String key, Object value) {
+        this.data.put(key, value);
+        return this;
     }
 }
 

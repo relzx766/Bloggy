@@ -4,17 +4,20 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zyq.bloggy.annotation.Statistics;
 import com.zyq.bloggy.annotation.TaskInfo;
-import com.zyq.bloggy.annotation.TrendCounter;
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.mapStruct.ArticleVoMapper;
 import com.zyq.bloggy.mapper.ArticleMapper;
-import com.zyq.bloggy.model.pojo.Article;
 import com.zyq.bloggy.model.entity.Status;
 import com.zyq.bloggy.model.entity.ThumbsUp;
-import com.zyq.bloggy.serivce.*;
-import com.zyq.bloggy.util.StringUtils;
+import com.zyq.bloggy.model.pojo.Article;
 import com.zyq.bloggy.model.vo.ArticleVo;
+import com.zyq.bloggy.serivce.ArticleService;
+import com.zyq.bloggy.serivce.RedisService;
+import com.zyq.bloggy.serivce.TagService;
+import com.zyq.bloggy.serivce.UserService;
+import com.zyq.bloggy.util.StringUtils;
 import com.zyq.bloggy.util.TimeUtil;
 import io.github.ms100.cacheasmulti.cache.annotation.CacheAsMulti;
 import lombok.extern.slf4j.Slf4j;
@@ -42,21 +45,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @CacheConfig(cacheNames = "article#600")
 public class ArticleServiceImpl implements ArticleService {
-    @Autowired
-    ArticleMapper articleMapper;
-    @Autowired
-    UserService userService;
-    @Autowired
-    TagService tagService;
-    @Autowired
-    ArticleVoMapper articleVoMapper;
-    @Autowired
-    ThumbsUpService thumbsUpService;
-    @Autowired
-    RedisTemplate redisTemplate;
-    @Autowired
-    RedisService redisService;
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String KEY_ARTICLE_LIKE_COUNT = "count:like:article";
     private static final String KEY_ARTICLE_LIKE = "like:article";
     private static final String KEY_ARTICLE_COMMENT_COUNT = "count:comment:article";
@@ -67,20 +55,20 @@ public class ArticleServiceImpl implements ArticleService {
     private static final String KEY_ADMIN_ARTICLE_PAGE = "admin:article:page#30";
     private static final String KEY_ARTICLE_ACTIVE_COUNT = "count:article:active#60";
     private final int DESCRIPTION_LENGTH = 100;
+    @Autowired
+    ArticleMapper articleMapper;
+    @Autowired
+    UserService userService;
+    @Autowired
+    TagService tagService;
+    @Autowired
+    ArticleVoMapper articleVoMapper;
+    @Autowired
+    RedisTemplate redisTemplate;
+    @Autowired
+    RedisService redisService;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private String getDescription(String content) {
-        String description;
-        String imageUrl = StringUtils.getImageOfMarkdown(content);
-        int offset;
-        if (null != imageUrl && content.indexOf(imageUrl) < DESCRIPTION_LENGTH) {
-            String replace = "【图片】";
-            offset = content.indexOf(imageUrl) + imageUrl.length();
-            description = content.substring(0, offset).replace(imageUrl, replace);
-        } else {
-            description = content.substring(0, content.length() > DESCRIPTION_LENGTH ? DESCRIPTION_LENGTH : content.length());
-        }
-        return description;
-    }
 
     @Override
     public Article publish(Article article) {
@@ -90,13 +78,15 @@ public class ArticleServiceImpl implements ArticleService {
         article.setId(IdWorker.getId());
         article.setAuthor(StpUtil.getLoginIdAsLong());
         article.setLikeNum(0);
+        if (Objects.isNull(article.getTags())) {
+            article.setTags(new String[0]);
+        }
         article.setViews(0);
         article.setComments(0);
         article.setStatus(Status.ACTIVE.getCode());
         article.setCreateTime(new Timestamp(System.currentTimeMillis()));
         article.setUpdateTime(new Timestamp(System.currentTimeMillis()));
-        String content = article.getContent();
-        article.setDescription(getDescription(content));
+        article.setDescription(StringUtils.cutString(StringUtils.filterMd(StringUtils.replaceImage(article.getContent())), DESCRIPTION_LENGTH));
         articleMapper.addArticle(article);
         return article;
     }
@@ -133,7 +123,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (StringUtils.isAnyBlank(article.getTitle(), article.getContent())) {
             throw new BusinessException("标题和内容不能为空");
         }
-        article.setDescription(getDescription(article.getContent()));
+        article.setDescription(StringUtils.cutString(StringUtils.filterMd(StringUtils.replaceImage(article.getContent())), DESCRIPTION_LENGTH));
         article.setUpdateTime(new Timestamp(System.currentTimeMillis()));
         articleMapper.updateByUserId(article, userId);
         ArticleVo articleVo = articleVoMapper.toVo(article);
@@ -142,8 +132,8 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    @TrendCounter(key = "'count:article:trend:'+#id")
-    @Cacheable(cacheNames = "article#600", key = "#id")
+    @Statistics(key = "'count:article:trend:'+#id", timeout = 3)
+    @Cacheable(cacheNames = "article#60", key = "#id")
     public ArticleVo getDetail(Long id) {
         try {
             return articleMapper.getDetail(id);
@@ -151,6 +141,11 @@ public class ArticleServiceImpl implements ArticleService {
             throw new BusinessException("没有该文章", e);
         }
 
+    }
+
+    @Override
+    public ArticleVo getDetailForAdmin(Long id) {
+        return articleMapper.getDetailForAdmin(id);
     }
 
     @Override
@@ -308,6 +303,11 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<ArticleVo> getTrend() {
         return (List<ArticleVo>) redisTemplate.opsForValue().get(KEY_ARTICLE_TREND);
+    }
+
+    @Override
+    public List<Map<String, Integer>> getCountRangeByDate(Integer day) {
+        return articleMapper.getCountRangeByTime(TimeUtil.getTimestampRange(day));
     }
 
     @Override

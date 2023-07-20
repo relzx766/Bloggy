@@ -5,12 +5,11 @@ import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.stp.StpUtil;
 import com.zyq.bloggy.model.entity.Result;
 import com.zyq.bloggy.model.pojo.User;
+import com.zyq.bloggy.model.vo.UserVo;
 import com.zyq.bloggy.serivce.MailService;
 import com.zyq.bloggy.serivce.UserService;
 import com.zyq.bloggy.util.FileUtil;
-import com.zyq.bloggy.model.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -124,5 +123,18 @@ public class UserController {
         userService.activeAccount(id);
         log.info(String.format("用户{%s}账号重新激活", id));
         return Result.ok();
+    }
+
+    @GetMapping("/count")
+    public Result getCount() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("all", userService.getUserCount());
+        data.put("active", userService.getActiveUserCount());
+        return Result.ok(data);
+    }
+
+    @GetMapping("/count/{num}")
+    public Result getCountByDay(@PathVariable("num") Integer num) {
+        return new Result().success().put("records", userService.getUserCountByDay(num));
     }
 }

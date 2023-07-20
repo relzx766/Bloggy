@@ -4,12 +4,10 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.zyq.bloggy.annotation.TrendCounter;
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.mapper.SortMapper;
-import com.zyq.bloggy.model.pojo.Article;
-import com.zyq.bloggy.model.pojo.Sort;
 import com.zyq.bloggy.model.entity.Status;
+import com.zyq.bloggy.model.pojo.Sort;
 import com.zyq.bloggy.model.vo.ArticleVo;
 import com.zyq.bloggy.serivce.ArticleService;
 import com.zyq.bloggy.serivce.SortService;
@@ -18,9 +16,6 @@ import io.github.ms100.cacheasmulti.cache.annotation.CacheAsMulti;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -33,11 +28,11 @@ import java.util.Objects;
 @Slf4j
 @CacheConfig(cacheNames = "sort")
 public class SortServiceImpl implements SortService {
+    private static final String DEFAULT_COVER = "http://localhost:8080/default/cover.png";
     @Autowired
     SortMapper sortMapper;
     @Autowired
     ArticleService articleService;
-    private static final String DEFAULT_COVER = "http://localhost:8080/default/cover.png";
 
     @Override
     public Sort addSort(Sort sort) {

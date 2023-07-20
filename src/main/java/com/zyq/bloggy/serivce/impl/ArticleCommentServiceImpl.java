@@ -8,16 +8,16 @@ import com.zyq.bloggy.annotation.TaskInfo;
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.mapStruct.CommentVoMapper;
 import com.zyq.bloggy.mapper.ArticleCommentMapper;
-import com.zyq.bloggy.model.pojo.ArticleComment;
 import com.zyq.bloggy.model.entity.Status;
 import com.zyq.bloggy.model.entity.ThumbsUp;
+import com.zyq.bloggy.model.pojo.ArticleComment;
 import com.zyq.bloggy.model.pojo.User;
+import com.zyq.bloggy.model.vo.CommentVo;
 import com.zyq.bloggy.serivce.ArticleCommentService;
 import com.zyq.bloggy.serivce.RedisService;
 import com.zyq.bloggy.serivce.ReplyCommentService;
 import com.zyq.bloggy.serivce.UserService;
 import com.zyq.bloggy.util.StringUtils;
-import com.zyq.bloggy.model.vo.CommentVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -40,6 +40,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @CacheConfig(cacheNames = "articleComment")
 public class ArticleCommentServiceImpl implements ArticleCommentService {
+    public static final String KEY_COMMENT_LIKE_COUNT = "count:like:comment";
+    public static final String KEY_COMMENT_LIKE = "like:comment";
+    private static final String KEY_ARTICLE_COMMENT_COUNT = "count:comment:article";
+    private static final String KEY_COMMENT_IS_LIKE = "isLike:comment";
     @Autowired
     ArticleCommentMapper articleCommentMapper;
     @Autowired
@@ -53,10 +57,6 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
     @Autowired
     RedisService redisService;
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    public static final String KEY_COMMENT_LIKE_COUNT = "count:like:comment";
-    public static final String KEY_COMMENT_LIKE = "like:comment";
-    private static final String KEY_ARTICLE_COMMENT_COUNT = "count:comment:article";
-    private static final String KEY_COMMENT_IS_LIKE = "isLike:comment";
 
     @Override
     public CommentVo post(ArticleComment articleComment) {

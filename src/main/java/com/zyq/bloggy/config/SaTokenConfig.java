@@ -12,6 +12,7 @@ import java.util.List;
 @Configuration
 public class SaTokenConfig implements WebMvcConfigurer {
     private List<String> excludePath = new ArrayList<>();
+
     //登录验证
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -21,7 +22,7 @@ public class SaTokenConfig implements WebMvcConfigurer {
         excludePath.add("/default/**");
         excludePath.add("/image/**");
         excludePath.add("/video/**");
-        registry.addInterceptor(new SaInterceptor(handle->{
+        registry.addInterceptor(new SaInterceptor(handle -> {
                     StpUtil.checkLogin();
                 }))
                 .addPathPatterns("/**")

@@ -1,7 +1,9 @@
 package com.zyq.bloggy.util;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -33,5 +35,18 @@ public class TimeUtil {
     public static String getDateString(Date date) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh-MM-ss");
         return dateFormat.format(date);
+    }
+
+    /**
+     * 获取从现在往前指定天数的时间戳
+     *
+     * @param num
+     * @return
+     */
+    public static Timestamp getTimestampRange(Integer num) {
+        LocalDate today = LocalDate.now();
+        LocalDate beginDay = today.minusDays(num);
+        Timestamp start = Timestamp.valueOf(beginDay.atStartOfDay());
+        return start;
     }
 }

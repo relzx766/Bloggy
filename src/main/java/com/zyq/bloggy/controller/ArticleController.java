@@ -3,9 +3,9 @@ package com.zyq.bloggy.controller;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.StpUtil;
-import com.zyq.bloggy.model.pojo.Article;
 import com.zyq.bloggy.model.entity.Result;
 import com.zyq.bloggy.model.entity.ThumbsUp;
+import com.zyq.bloggy.model.pojo.Article;
 import com.zyq.bloggy.model.vo.ArticleVo;
 import com.zyq.bloggy.serivce.ArticleService;
 import com.zyq.bloggy.serivce.MailService;
@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,8 +50,8 @@ public class ArticleController {
             , @RequestParam("reason") String reason) {
         articleService.delete(id);
         log.info(String.format("管理员{%s}删除了文章，id为{%s}", StpUtil.getLoginIdAsString(), id));
-            mailService.sendWorkDeletedAdvice(id, reason);
-            return Result.ok("删除成功");
+        mailService.sendWorkDeletedAdvice(id, reason);
+        return Result.ok("删除成功");
     }
 
     @PostMapping("/update")
@@ -71,6 +70,15 @@ public class ArticleController {
         articleVo.setIsSort(sortService.getArticleIsSort(id, userId));
         data.put("article", articleVo);
         articleService.addView(id);
+        return Result.ok(data);
+    }
+
+    @GetMapping("/admin/detail/{id}")
+    @SaCheckRole("ADMIN")
+    public Result getDetail(@PathVariable("id") Long id) {
+        Map<String, Object> data = new HashMap<>();
+        ArticleVo articleVo = articleService.getDetailForAdmin(id);
+        data.put("article", articleVo);
         return Result.ok(data);
     }
 
@@ -167,4 +175,8 @@ public class ArticleController {
         return Result.ok(data);
     }
 
+    @GetMapping("/count/{num}")
+    public Result getCountRange(@PathVariable("num") Integer num) {
+        return new Result().success().put("records", articleService.getCountRangeByDate(num));
+    }
 }

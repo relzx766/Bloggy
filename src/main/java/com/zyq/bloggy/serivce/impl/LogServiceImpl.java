@@ -11,16 +11,19 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
 public class LogServiceImpl implements LogService {
+    static int DELETE_OFFSET = 20;
+    public final ConcurrentLinkedQueue<WebLog> queue = new ConcurrentLinkedQueue<>();
+    private final Executor executor = Executors.newSingleThreadExecutor();
     @Autowired
     LogMapper logMapper;
-    static int DELETE_OFFSET = 20;
-    private final Executor executor = Executors.newSingleThreadExecutor();
-    public final ConcurrentLinkedQueue<WebLog> queue = new ConcurrentLinkedQueue<>();
 
     @Override
     public void addLogToQueue(WebLog webLog) {

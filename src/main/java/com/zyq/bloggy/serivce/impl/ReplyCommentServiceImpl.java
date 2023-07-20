@@ -8,14 +8,14 @@ import com.zyq.bloggy.annotation.TaskInfo;
 import com.zyq.bloggy.exception.BusinessException;
 import com.zyq.bloggy.mapStruct.CommentVoMapper;
 import com.zyq.bloggy.mapper.ReplyCommentMapper;
-import com.zyq.bloggy.model.pojo.ReplyComment;
 import com.zyq.bloggy.model.entity.Status;
 import com.zyq.bloggy.model.entity.ThumbsUp;
+import com.zyq.bloggy.model.pojo.ReplyComment;
+import com.zyq.bloggy.model.vo.CommentVo;
 import com.zyq.bloggy.serivce.RedisService;
 import com.zyq.bloggy.serivce.ReplyCommentService;
 import com.zyq.bloggy.serivce.UserService;
 import com.zyq.bloggy.util.StringUtils;
-import com.zyq.bloggy.model.vo.CommentVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -37,6 +37,10 @@ import java.util.Objects;
 @Slf4j
 @CacheConfig(cacheNames = "replyComment")
 public class ReplyCommentServiceImpl implements ReplyCommentService {
+    private static final String KEY_REPLY_LIKE_COUNT = "count:like:reply";
+    private static final String KEY_REPLY_LIKE = "like:reply";
+    private static final String KEY_ARTICLE_COMMENT_COUNT = "count:comment:article";
+    private static final String KEY_REPLY_IS_LIKE = "isLike:reply";
     @Autowired
     ReplyCommentMapper replyCommentMapper;
     @Autowired
@@ -48,10 +52,6 @@ public class ReplyCommentServiceImpl implements ReplyCommentService {
     @Autowired
     RedisTemplate redisTemplate;
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final String KEY_REPLY_LIKE_COUNT = "count:like:reply";
-    private static final String KEY_REPLY_LIKE = "like:reply";
-    private static final String KEY_ARTICLE_COMMENT_COUNT = "count:comment:article";
-    private static final String KEY_REPLY_IS_LIKE = "isLike:reply";
 
     @Override
     public CommentVo post(ReplyComment replyComment) {

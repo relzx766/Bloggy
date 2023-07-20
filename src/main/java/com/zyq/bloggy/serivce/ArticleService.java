@@ -1,8 +1,8 @@
 package com.zyq.bloggy.serivce;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.zyq.bloggy.model.pojo.Article;
 import com.zyq.bloggy.model.entity.ThumbsUp;
+import com.zyq.bloggy.model.pojo.Article;
 import com.zyq.bloggy.model.vo.ArticleVo;
 
 import java.util.ArrayList;
@@ -25,6 +25,8 @@ public interface ArticleService {
     ArticleVo update(Article article, Long userId);
 
     ArticleVo getDetail(Long id);
+
+    ArticleVo getDetailForAdmin(Long id);
 
     Article getById(Long id);
 
@@ -63,10 +65,10 @@ public interface ArticleService {
     @Deprecated
     Page<ArticleVo> getUserPage(int page);
 
-    void updateTrend();
 
     List<ArticleVo> getTrend();
 
+    List<Map<String, Integer>> getCountRangeByDate(Integer day);
 
     void addView(Long id);
 
@@ -74,7 +76,10 @@ public interface ArticleService {
 
     void cancelLike(ThumbsUp thumbs);
 
+    boolean getIsLiked(Long userId, Long articleId);
+
     void updateCacheLike(Long id, Integer delta);
+    //以下都为定时任务
 
     void saveLikeToDB();
 
@@ -82,10 +87,11 @@ public interface ArticleService {
 
     void updateDBView();
 
-    boolean getIsLiked(Long userId, Long articleId);
 
     void updateCommentNum();
 
     void decrementTrend();
+
+    void updateTrend();
 
 }

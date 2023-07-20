@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -33,21 +32,21 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @CacheConfig(cacheNames = "mail")
 public class MailServiceImpl implements MailService {
+    private static final String REG_SUBJECT = "Bloggy:验证您的邮箱";
+    private static final String ADVICE_SUBJECT = "Bloggy:通知";
+    private static final String KEY_VALIDATE_CODE = "validateCode";
     @Autowired
     UserService userService;
     @Autowired
     ArticleService articleService;
     @Resource
     JavaMailSender javaMailSender;
-    @Value("${spring.mail.username}")
-    private String SENDER_MAIL;
     @Autowired
     TemplateEngine templateEngine;
     @Autowired
     RedisTemplate redisTemplate;
-    private static final String REG_SUBJECT = "Bloggy:验证您的邮箱";
-    private static final String ADVICE_SUBJECT = "Bloggy:通知";
-    private static final String KEY_VALIDATE_CODE = "validateCode";
+    @Value("${spring.mail.username}")
+    private String SENDER_MAIL;
 
     @Override
     @Async

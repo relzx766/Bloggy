@@ -9,11 +9,11 @@ public enum Status {
     NONACTIVE(2);
     private Integer code;
 
-    public Integer getCode() {
-        return code;
-    }
-
     Status(Integer code) {
         this.code = code;
+    }
+
+    public Integer getCode() {
+        return code;
     }
 }

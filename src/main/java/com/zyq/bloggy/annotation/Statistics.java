@@ -1,17 +1,25 @@
 package com.zyq.bloggy.annotation;
 
+import jakarta.validation.constraints.NotNull;
 import org.intellij.lang.annotations.Language;
-import org.springframework.lang.NonNull;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
-@Deprecated
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TrendCounter {
+public @interface Statistics {
+    String cacheName() default "";
 
-    @Language("SpEL") @NonNull String key();
+    @Language("SpEL") @NotNull String key();
+
+    int delta() default 1;
+
+    TimeUnit util() default TimeUnit.DAYS;
+
+    long timeout() default -1;
+
 }

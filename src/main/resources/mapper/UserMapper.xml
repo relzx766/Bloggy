@@ -25,4 +25,11 @@
                  join tb_reply_comment_like trcl on trcl.user_id = tu.id
         where tu.id = #{id};
     </select>
+    <select id="getCountByTime" resultType="java.util.Map">
+        select date_format(registration_time, '%Y-%m-%d') as date, count(id) as count
+        from tb_user
+        where registration_time between #{time} and now()
+        group by date_format(registration_time, '%Y-%m-%d')
+
+    </select>
 </mapper>

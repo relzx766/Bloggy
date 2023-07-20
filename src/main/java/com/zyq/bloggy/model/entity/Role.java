@@ -9,8 +9,8 @@ public enum Role {
     VISITOR(2);
     private Integer code;
 
-    public Integer getCode() {
-        return code;
+    Role(Integer code) {
+        this.code = code;
     }
 
     public static String getRole(int code) {
@@ -21,8 +21,8 @@ public enum Role {
         };
     }
 
-    Role(Integer code) {
-        this.code = code;
+    public Integer getCode() {
+        return code;
     }
 
 }

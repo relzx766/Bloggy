@@ -12,6 +12,8 @@ public interface RedisService {
 
     List<AdvertisingVo> getAdvertising();
 
+    AdvertisingVo updateAdvertising(AdvertisingVo advertisingVo);
+
     boolean delAdvertising(int id);
 
     boolean isFileExist(MultipartFile multipartFile);
@@ -29,5 +31,10 @@ public interface RedisService {
 
     //返回一个由被取消点赞id和点赞信息的map
     Map<Long, List<ThumbsUp>> getCancelLike(String key);
+
+    Object getPageView();
+
+    Object getUniqueView();
+
 
 }

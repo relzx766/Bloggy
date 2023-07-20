@@ -2,17 +2,19 @@ package com.zyq.bloggy.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.stp.StpUtil;
-import com.zyq.bloggy.model.pojo.ArticleComment;
-import com.zyq.bloggy.model.pojo.ReplyComment;
 import com.zyq.bloggy.model.entity.Result;
 import com.zyq.bloggy.model.entity.ThumbsUp;
+import com.zyq.bloggy.model.pojo.ArticleComment;
+import com.zyq.bloggy.model.pojo.ReplyComment;
 import com.zyq.bloggy.serivce.ArticleCommentService;
 import com.zyq.bloggy.serivce.ReplyCommentService;
 import com.zyq.bloggy.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/comment")

@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public interface ThumbsUpService {
     //缓存到redis
     void likeArticle(ThumbsUp thumbs);
