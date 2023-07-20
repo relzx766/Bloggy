@@ -30,3 +30,20 @@ export const getMonthAndDay=(timestamp)=>{
     day = day.toString().padStart(2, '0');
     return month + '/' + day;
 }
+export const descArray=(arr)=>{
+   return  arr.sort((a,b)=>{
+        return b-a;
+    })
+}
+export const ascArray=(arr)=>{
+   return  arr.sort((a,b)=>{
+        return a-b;
+    })
+}
+export const getDaysBetween=(dateString1, dateString2)=> {
+    let startDate = Date.parse(dateString1);
+    let endDate = Date.parse(dateString2);
+    let days = (endDate - startDate) / (1 * 24 * 60 * 60 * 1000);
+    return days;
+}
+

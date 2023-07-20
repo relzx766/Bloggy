@@ -18,3 +18,9 @@ export const activeAccount=async (id)=>{
         data:{id:id}
     })
 }
+export const getRegCountByDay=async (num)=>{
+    return Get({
+        url:'/user/count',
+        params:{num}
+    })
+}

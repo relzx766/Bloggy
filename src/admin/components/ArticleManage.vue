@@ -67,7 +67,7 @@
         <el-button size="mini">搜索</el-button>
       </template>
       <template slot-scope="scope">
-        <el-button  type="info"  size="mini" @click="toDetail(articles[scope.$index].id)">
+        <el-button  type="info"  size="mini" @click="toDetail(scope.$index)">
           详情
         </el-button>
         <el-button
@@ -96,11 +96,41 @@
         :total="count">
     </el-pagination>
   </div>
+  <el-dialog
+      title="文章详情"
+      :visible.sync="detailDialog"
+      width="60%">
+    <div v-if="!articleDetail.isEmpty">
+      <div id="title" style="margin-bottom: 8px;text-align: center">
+        <h1 style="font-size: 28px">{{ articleDetail.title }}</h1>
+      </div>
+      <div id="article-info" style="font-size: 10px;font-weight: lighter;height: 14px;margin-top: 6px;text-align: center">
+        <span>{{ articleDetail.views }}阅读</span>
+        <span>{{ articleDetail.comments }}评论</span>
+        <span>{{ articleDetail.likeNum }}喜欢</span>
+        <span>{{new Date(articleDetail.createTime).toLocaleString()}}</span>
+      </div>
+      <div id="content">
+        <mavon-editor
+            :value="articleDetail.content"
+            :subfield="false"
+            defaultOpen="preview"
+            :toolbarsFlag="false"
+            :editable="false"
+            style="z-index: 5"
+        ></mavon-editor>
+      </div>
+    </div>
+    <span slot="footer" class="dialog-footer">
+      </span>
+  </el-dialog>
+
 </div>
 </template>
 
 <script>
-import {getArticlePage,articleRemove,activeArticle} from "@/admin/api/Article";
+import {getArticlePage,articleRemove,activeArticle,getDetail} from "@/admin/api/Article";
+import {marked} from "marked"
 
 export default {
   name: "ArticleManage",
@@ -108,7 +138,9 @@ export default {
     return{
       articles:[],
       page:1,
-      count:0
+      count:0,
+      articleDetail:{},
+      detailDialog:false,
     }
   },
   methods:{
@@ -120,6 +152,9 @@ export default {
         this.articles=res.data.articles
         this.count=res.data.count
       })
+    },
+    getHtml(content) {
+        return marked(content)
     },
     getTime(time){
       return new Date(time).toLocaleDateString()
@@ -162,8 +197,13 @@ export default {
         }
       })
     },
-    toDetail(id){
-      this.$router.push("/detail?id="+id)
+    toDetail(index){
+      let id=this.articles[index].id;
+      getDetail(id).then((res)=>{
+        this.articleDetail=res.data.article
+        this.articleDetail.content=this.getHtml(this.articleDetail.content);
+        this.detailDialog=true
+      })
     }
   },
   created() {

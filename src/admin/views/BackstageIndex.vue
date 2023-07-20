@@ -5,6 +5,7 @@
   </el-header>
   <el-main>
     <el-tabs tab-position="left">
+      <el-tab-pane label="仪表盘"><dash-board/></el-tab-pane>
       <el-tab-pane label="用户管理"><user-manage/></el-tab-pane>
       <el-tab-pane label="文章管理"><article-manage/></el-tab-pane>
       <el-tab-pane label="广告管理"><ad-manage/></el-tab-pane>
@@ -21,6 +22,7 @@ import BackNavigation from "@/admin/components/BackNavigation.vue";
 import UserManage from "@/admin/components/UserManage.vue";
 import ArticleManage from "@/admin/components/ArticleManage.vue";
 import AdvertisingManage from "@/admin/components/AdvertisingManage.vue";
+import DashBoard from "@/admin/components/DashBoard.vue";
 
 export default {
   name: "BackstageIndex",
@@ -28,7 +30,8 @@ export default {
     'navigation':BackNavigation,
     'user-manage':UserManage,
     'article-manage':ArticleManage,
-    'ad-manage':AdvertisingManage
+    'ad-manage':AdvertisingManage,
+    'dash-board':DashBoard
   },
   created() {
     let role=this.$cookie.get("role");

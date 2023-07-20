@@ -37,11 +37,12 @@
           <span>{{ article.views }}阅读</span>
           <span>{{ article.comments }}评论</span>
           <span>{{ article.likeNum }}喜欢</span>
-          <span>{{ article.createTime }}</span>
+          <span>{{ new Date(article.createTime).toLocaleString() }}</span>
         </div>
         <div id="content">
           <mavon-editor
-              :value="getHtml()"
+              v-model="article.content"
+              ref="md"
               :subfield="false"
               defaultOpen="preview"
               :toolbarsFlag="false"
@@ -159,7 +160,7 @@ export default {
       })
     },
     getHtml() {
-      return marked(this.article.content)
+      return this.$refs.md.$render(this.article.content)
     },
     changeRelation() {
       let that = this

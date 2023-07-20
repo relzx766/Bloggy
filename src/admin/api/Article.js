@@ -23,3 +23,15 @@ export const activeArticle=async (id)=>{
         }
     })
 }
+export const getDetail=async (id)=>{
+    return Get({
+        url:'/article/admin/detail',
+        params:{id}
+    })
+}
+export const getPublishCountByDay=async (num)=>{
+    return Get({
+        url:'/article/count',
+        params:{num}
+    })
+}

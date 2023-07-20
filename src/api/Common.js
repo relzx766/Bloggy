@@ -8,6 +8,6 @@ export const uploadFile=async (data={})=>{
 }
 export const getAd=async ()=>{
     return Get({
-        url:'/trend/ad'
+        url:'/statistic/ad'
     })
 }

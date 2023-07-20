@@ -136,8 +136,6 @@ export default {
       getUserList(this.page).then((res)=>{
         this.users=res.data.page.records
         this.count=res.data.page.total
-        console.log("dasasdsd")
-        console.log(this.users)
       })
     },
     getTime(time){

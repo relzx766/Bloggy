@@ -14,7 +14,7 @@ export const getArticleDetail=async (id)=>{
 }
 export const getArticleTrend=async ()=>{
     return Get({
-        url:"/trend/article"
+        url:"/statistic/article"
     })
 }
 export const postArticle=async (data={})=>{
