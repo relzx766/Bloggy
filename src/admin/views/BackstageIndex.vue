@@ -4,13 +4,15 @@
     <navigation/>
   </el-header>
   <el-main>
-    <el-tabs tab-position="left">
-      <el-tab-pane label="仪表盘"><dash-board/></el-tab-pane>
-      <el-tab-pane label="用户管理"><user-manage/></el-tab-pane>
-      <el-tab-pane label="文章管理"><article-manage/></el-tab-pane>
-      <el-tab-pane label="广告管理"><ad-manage/></el-tab-pane>
+    <el-row>
+      <el-col :span="2">
+        <left-navigation/>
+      </el-col>
+      <el-col :span="22">
+        <router-view></router-view>
+      </el-col>
+    </el-row>
 
-    </el-tabs>
 
 
   </el-main>
@@ -18,11 +20,12 @@
 </template>
 
 <script>
-import BackNavigation from "@/admin/components/BackNavigation.vue";
-import UserManage from "@/admin/components/UserManage.vue";
-import ArticleManage from "@/admin/components/ArticleManage.vue";
-import AdvertisingManage from "@/admin/components/AdvertisingManage.vue";
-import DashBoard from "@/admin/components/DashBoard.vue";
+import BackNavigation from "@/admin/views/BackNavigation.vue";
+import UserManage from "@/admin/views/UserManage.vue";
+import ArticleManage from "@/admin/views/ArticleManage.vue";
+import AdvertisingManage from "@/admin/views/AdvertisingManage.vue";
+import DashBoard from "@/admin/views/DashBoard.vue";
+import LeftNavigation from "@/admin/components/LeftNavigation.vue";
 
 export default {
   name: "BackstageIndex",
@@ -31,7 +34,8 @@ export default {
     'user-manage':UserManage,
     'article-manage':ArticleManage,
     'ad-manage':AdvertisingManage,
-    'dash-board':DashBoard
+    'dash-board':DashBoard,
+    'left-navigation':LeftNavigation
   },
   created() {
     let role=this.$cookie.get("role");
@@ -43,5 +47,7 @@ export default {
 </script>
 
 <style scoped>
-
+body{
+  background-color: #f4f4f4;
+}
 </style>

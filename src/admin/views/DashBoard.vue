@@ -1,64 +1,7 @@
 <template>
-  <el-container style="width: 100%;">
+  <el-container>
     <el-main style="width: 100%;">
       <el-row>
-        <el-col :span="11" :offset="0">
-          <el-card>
-            <div id="rc" class="view-box">
-              <div class="view-toolbar">
-                <span class="view-title">Rc</span>
-                <el-select class="view-select" v-model="rcMonthValue" @change="refreshRcChart" size="mini">
-                  <el-option
-                      v-for="item in rcMonthOption"
-                      :key="item"
-                      :label="item"
-                      :value="item">
-                  </el-option>
-                </el-select>
-                <el-select class="view-select" @change="handlerRcYearChange" v-model="rcYearValue" size="mini">
-                  <el-option
-                      v-for="item in rcYearOption"
-                      :key="item"
-                      :label="item"
-                      :value="item">
-                  </el-option>
-                </el-select>
-              </div>
-              <div ref="rcChart" class="chart"></div>
-            </div>
-
-          </el-card>
-        </el-col>
-        <el-col :span="11" :offset="2">
-          <el-card>
-            <div id="uv" class="view-box">
-              <div class="view-toolbar">
-                <span class="view-title">Uv</span>
-                <el-select class="view-select" v-model="uvMonthValue" @change="refreshUvChart" size="mini">
-                  <el-option
-                      v-for="item in uvMonthOption"
-                      :key="item"
-                      :label="item"
-                      :value="item">
-                  </el-option>
-                </el-select>
-                <el-select class="view-select" @change="handlerUvYearChange" v-model="uvYearValue" size="mini">
-                  <el-option
-                      v-for="item in uvYearOption"
-                      :key="item"
-                      :label="item"
-                      :value="item">
-                  </el-option>
-                </el-select>
-              </div>
-              <div ref="uvChart" class="chart"></div>
-            </div>
-
-          </el-card>
-        </el-col>
-      </el-row>
-      <el-row style="margin-top: 30px">
-        <el-col :span="11" :offset="0">
           <el-card>
             <div id="articleRange" class="view-box">
               <el-row>
@@ -67,20 +10,78 @@
                 </el-col>
                 <el-col :span="12" class="view-bar-right">
                   <span class="view-title">最近</span>
-                  <el-input v-model="articleDayRange"  @change="artRangeChange" style="width: 30%;
+                  <el-input v-model="articleDayRange"  @change="artRangeChange" style="width: 10%;
 margin-left: 6px;margin-right: 6px;
 " size="mini"/>
                   <span class="view-title">天</span>
                 </el-col>
               </el-row>
-              <div ref="articleChart" class="chart"></div>
+              <div ref="articleChart" style="width: 100%;height: 80%" class="chart"></div>
             </div>
 
           </el-card>
-        </el-col>
-        <el-col :span="11" :offset="2">
-          <el-card>
+
+      </el-row>
+      <el-row  style="margin-top: 30px;display: flex;">
+          <el-card class="view-count">
+            <div id="rc" class="view-box">
+              <el-row>
+                <el-col :span="12" class="view-bar-left">
+                  <span class="view-title">Rc</span>
+                </el-col>
+                <el-col :span="12" class="view-bar-right">
+                  <el-select class="view-select" v-model="rcMonthValue" @change="refreshRcChart" size="mini">
+                    <el-option
+                        v-for="item in rcMonthOption"
+                        :key="item"
+                        :label="item"
+                        :value="item">
+                    </el-option>
+                  </el-select>
+                  <el-select class="view-select" @change="handlerRcYearChange" v-model="rcYearValue" size="mini">
+                    <el-option
+                        v-for="item in rcYearOption"
+                        :key="item"
+                        :label="item"
+                        :value="item">
+                    </el-option>
+                  </el-select>
+                </el-col>
+              </el-row>
+              <div ref="rcChart" style="width: 100%;height: 80%" class="chart"></div>
+            </div>
+          </el-card>
+          <el-card class="view-count">
             <div id="uv" class="view-box">
+              <el-row>
+                <el-col :span="12" class="view-bar-left">
+                  <span class="view-title">Rc</span>
+                </el-col>
+                <el-col :span="12" class="view-bar-right">
+                  <el-select class="view-select" v-model="uvMonthValue" @change="refreshUvChart" size="mini">
+                    <el-option
+                        v-for="item in uvMonthOption"
+                        :key="item"
+                        :label="item"
+                        :value="item">
+                    </el-option>
+                  </el-select>
+                  <el-select class="view-select" @change="handlerUvYearChange" v-model="uvYearValue" size="mini">
+                    <el-option
+                        v-for="item in uvYearOption"
+                        :key="item"
+                        :label="item"
+                        :value="item">
+                    </el-option>
+                  </el-select>
+                </el-col>
+              </el-row>
+              <div ref="uvChart" style="width: 100%;height: 80%" class="chart"></div>
+            </div>
+
+          </el-card>
+          <el-card class="view-count">
+            <div id="userRange" class="view-box">
               <el-row>
                 <el-col :span="12" class="view-bar-left">
                   <span class="view-title">用户注册统计</span>
@@ -93,10 +94,9 @@ margin-left: 6px;margin-right: 6px;
                   <span class="view-title">天</span>
                 </el-col>
               </el-row>
-              <div ref="userChart" class="chart"></div>
+              <div ref="userChart" style="width: 100%;height: 80%" class="chart"></div>
             </div>
           </el-card>
-        </el-col>
       </el-row>
 
     </el-main>
@@ -133,6 +133,12 @@ export default {
       rcChart: null,
       rcChartConfig: {
         tooltip: {},
+        grid:{
+          left:10,
+          right:10,
+          bottom:'10%',
+          containLabel:true
+        },
         xAxis: {
           type: 'category',
           data: []
@@ -156,7 +162,8 @@ export default {
           type: 'slider',
           start: 0,
           end: 100,
-          height: 14,
+          height: 10,
+          bottom:4,
           showDataShadow: true,
           showDetail: false,
           show: false
@@ -166,6 +173,12 @@ export default {
       uvChartConfig: {
         color: '#96ce7a',
         tooltip: {},
+        grid:{
+          left:10,
+          right:10,
+          bottom:'10%',
+          containLabel:true
+        },
         xAxis: {
           type: 'category',
           data: []
@@ -185,6 +198,7 @@ export default {
           start: 0,
           end: 100,
           height: 14,
+          bottom:4,
           showDataShadow: true,
           showDetail: false,
           show: false
@@ -194,6 +208,12 @@ export default {
       articleChartConfig: {
         color: '#fccc60',
         tooltip: {},
+        grid:{
+          left:10,
+          right:10,
+          bottom:'10%',
+          containLabel:true
+        },
         xAxis: {
           type: 'category',
           data: []
@@ -222,6 +242,12 @@ export default {
       userChartConfig: {
         color: '#ec6464',
         tooltip: {},
+        grid:{
+          left:10,
+          right:10,
+          bottom:2,
+          containLabel:true
+        },
         xAxis: {
           type: 'category',
           data: []
@@ -390,19 +416,27 @@ export default {
 el-col {
   text-align: center;
 }
-
+.view-count{
+  width: 32%;
+  float: left;
+  height: 320px;
+}
+.view-count+.view-count{
+  margin-left: 2%;
+}
 .view-box {
   width: 100%;
-  height: 400px;
+  height: 320px;
+  text-align: center;
 }
 
 .chart {
-  width: 100%;
-  height: 80%;
+  width: 90%;
+  height: 90%;
 }
 
 .view-select {
-  width: 16%;
+  width: 40%;
   float: right;
 }
 
@@ -419,6 +453,11 @@ el-col {
 el-slider {
   width: 50%;
   float: right;
+}
+.el-popper[x-placement^=bottom] .popper__arrow::after {
+
+  border-bottom-color: #03204e !important;
+
 }
 
 </style>

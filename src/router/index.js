@@ -11,6 +11,11 @@ import Profile from "@/views/Profile";
 import SearchDetail from "@/views/SearchDetail";
 import BackstageIndex from "@/admin/views/BackstageIndex.vue";
 import SortDetail from "@/views/SortDetail.vue";
+import DashBoard from "@/admin/views/DashBoard.vue";
+import ArticleManage from "@/admin/views/ArticleManage.vue";
+import UserManage from "@/admin/views/UserManage.vue";
+import AdvertisingManage from "@/admin/views/AdvertisingManage.vue";
+import NotFoundPage from "@/NotFoundPage.vue";
 
 // 解决ElementUI导航栏中的vue-router在3.0版本以上重复点菜单报错问题
 const originalPush = VueRouter.prototype.push
@@ -66,14 +71,37 @@ const routes = [
         component: SearchDetail
     },
     {
-        path:'/admin/index',
-        name: 'admin-index',
-        component: BackstageIndex
-    },
-    {
         path: '/detail/sort',
         name:'detail/sort',
         component: SortDetail
+    },
+    {
+        path:'/admin',
+        component: BackstageIndex,
+        children:[
+            {
+                path:'article',
+                component:ArticleManage
+            },
+            {
+                path: 'user',
+                component: UserManage
+            },
+            {
+                path: 'ad',
+                component: AdvertisingManage
+            },
+            {
+                path:'board',
+                component: DashBoard
+            }
+
+        ]
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFoundPage
     }
 ]
 
@@ -81,5 +109,11 @@ const router = new VueRouter({
     mode: 'history',
     routes: routes
 })
-
+router.beforeEach((to,from,next)=>{
+    if (to.matched.length===0){
+        next({name:'NotFound'})
+    }else {
+        next()
+    }
+})
 export default router
