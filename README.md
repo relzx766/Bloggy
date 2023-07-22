@@ -43,6 +43,7 @@
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/83544985-da53-4caf-9e5e-83eb2f03ec7c)
 
 ### 仪表盘
-![image](https://github.com/relzx766/Bloggy/assets/81310484/ed620fe9-76d8-43e1-bbc7-e4b8c256a47f)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/00562ac2-9587-4585-b0e9-59df475c6c04)
+
 
 
