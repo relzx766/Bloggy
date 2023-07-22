@@ -8,10 +8,10 @@
         <el-row style="height: 120px">
           <el-col :span="3" style="text-align: left">
             <el-avatar
-                :size="100"
-                shape="square"
                 :fit="'cover'"
+                :size="100"
                 :src="user.avatar"
+                shape="square"
             >
             </el-avatar>
           </el-col>
@@ -24,7 +24,9 @@
             </el-row>
           </el-col>
           <el-col :span="11" style="text-align: right;line-height: 150px">
-            <el-button v-if="currentUserId===id" type="primary" icon="el-icon-user" @click="editProfileDialog=true">编辑个人资料</el-button>
+            <el-button v-if="currentUserId===id" icon="el-icon-user" type="primary" @click="editProfileDialog=true">
+              编辑个人资料
+            </el-button>
           </el-col>
         </el-row>
       </el-card>
@@ -48,22 +50,22 @@
       </el-row>
       <!-- 修改个人资料弹窗 -->
       <el-dialog
-          title="个人资料"
-          :visible.sync="editProfileDialog"
           :close-on-click-modal="false"
+          :visible.sync="editProfileDialog"
+          title="个人资料"
           width="30%">
         <el-form ref="form" :model="editProfile" label-width="80px">
           <el-row style="text-align:center">
             <el-upload
-                class="avatar-uploader"
-                action="#"
-                :http-request="submitProfile"
-                name="avatar"
-                :data="{nickname:editProfile.nickname}"
-                :show-file-list="false"
                 :auto-upload="false"
+                :before-upload="beforeAvatarUpload"
+                :data="{nickname:editProfile.nickname}"
+                :file-list="fileList"
+                :http-request="submitProfile"
+                :on-change="handleChange"
                 :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload" :file-list="fileList" :on-change="handleChange"><img
+                :show-file-list="false"
+                action="#" class="avatar-uploader" name="avatar"><img
                 v-if="fileList.length> 0" :src="fileList[0].url" class="avatar">
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
@@ -117,7 +119,8 @@ export default {
           user = res.data.user;
           this.$set(this, 'user', user);
         })
-      }},
+      }
+    },
     submitProfile(fileObject) {
       let data = new FormData();
       console.log(this.fileList[0])

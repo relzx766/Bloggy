@@ -1,35 +1,35 @@
 <template>
   <el-container>
-    <el-header style="margin-bottom: 40px;height: auto" id="header">
+    <el-header id="header" style="margin-bottom: 40px;height: auto">
       <div>
         <el-row style="width: 100%;">
           <el-col :span="2" style="text-align: left">
             <el-image
-                style="width: 66px; height: 66px;border-radius: 50%"
+                :fit="'cover'"
                 :src="avatar"
-                :fit="'cover'"></el-image>
+                style="width: 66px; height: 66px;border-radius: 50%"></el-image>
           </el-col>
-          <el-col :span="17" >
+          <el-col :span="17">
             <el-input
-                style="width: 700px;float: left;margin-top: 6px"
-                type="textarea"
+                v-model="comment.content"
                 :autosize="{ minRows: 2}"
                 :placeholder="comment.tempContent"
-                v-model="comment.content">
+                style="width: 700px;float: left;margin-top: 6px"
+                type="textarea">
             </el-input>
           </el-col>
           <el-col :span="4">
-            <el-button style="height: 50px;margin-top: 6px" type="primary" round @click="postComment">发布</el-button>
+            <el-button round style="height: 50px;margin-top: 6px" type="primary" @click="postComment">发布</el-button>
           </el-col>
         </el-row>
       </div>
       <el-divider/>
     </el-header>
     <el-main>
-      <div class="comments" v-for="(item,index) in comments">
+      <div v-for="(item,index) in comments" class="comments">
         <el-row>
           <el-col :span="2">
-            <el-image :fit="'cover'" style="border-radius: 50%;width: 60px;height: 60px;float: left" :src=item.avatar>
+            <el-image :fit="'cover'" :src=item.avatar style="border-radius: 50%;width: 60px;height: 60px;float: left">
               <div slot="placeholder" class="image-slot">
                 加载中<span class="dot">...</span>
               </div>
@@ -37,8 +37,8 @@
           </el-col>
           <el-col :span="6" style="float: left;margin-left: -10px">
             <div style="margin-top: 10px;font-weight: bold;text-align: left">{{ item.nickname }}
-              <el-tag  v-if="item.userId===userId" size="mini">自己</el-tag>
-              <el-tag type="danger" v-else-if="item.userId===author" size="mini">作者</el-tag>
+              <el-tag v-if="item.userId===userId" size="mini">自己</el-tag>
+              <el-tag v-else-if="item.userId===author" size="mini" type="danger">作者</el-tag>
             </div>
             <div style="font-weight: lighter;font-size: 14px;text-align: left">@{{ item.username }}</div>
           </el-col>
@@ -53,21 +53,23 @@
             <el-col :span="4">{{ getDate(item.createTime) }}</el-col>
             <el-col :span="6">
               <el-row>
-                <el-col @click.native="likeComment(index)" :class="{'el-icon-like':!item.isLike,'el-icon-liked':item.isLike}"
-                        style="width: 14px;height: 14px"></el-col>
+                <el-col :class="{'el-icon-like':!item.isLike,'el-icon-liked':item.isLike}"
+                        style="width: 14px;height: 14px"
+                        @click.native="likeComment(index)"></el-col>
 
                 <span>{{ item.likeNum }}</span></el-row>
             </el-col>
           </el-row>
           <el-row>
-            <div class="reply" v-for="(i,k) in getReplyByPage(replyPage,5,item.reply)">
+            <div v-for="(i,k) in getReplyByPage(replyPage,5,item.reply)" class="reply">
               <div style="width: 90%">
 
                 <el-divider></el-divider>
               </div>
               <el-row>
                 <el-col :span="1">
-                  <el-image :fit="'cover'" style="border-radius: 50%;width: 40px;height: 40px;float: left" :src=i.avatar>
+                  <el-image :fit="'cover'" :src=i.avatar
+                            style="border-radius: 50%;width: 40px;height: 40px;float: left">
                     <div slot="placeholder" class="image-slot">
                       加载中<span class="dot">...</span>
                     </div>
@@ -76,7 +78,7 @@
                 <el-col :span="4" style="float: left;margin-left: 10px">
                   <div style="margin-top: 4px;font-weight: bold;text-align: left;font-size: 14px">{{ i.nickname }}
                     <el-tag v-if="i.userId===userId" size="mini">自己</el-tag>
-                    <el-tag type="danger"  v-else-if="i.userId===author" size="mini">作者</el-tag>
+                    <el-tag v-else-if="i.userId===author" size="mini" type="danger">作者</el-tag>
                   </div>
                   <div style="font-weight: lighter;font-size: 12px;text-align: left">@{{ i.username }}</div>
                 </el-col>
@@ -90,8 +92,9 @@
                     <el-col :span="6">{{ getDate(i.createTime) }}</el-col>
                     <el-col :span="6">
                       <el-row>
-                        <el-col @click.native="likeReply(index,k)" :class="{'el-icon-like':!i.isLike,'el-icon-liked':i.isLike}"
-                                style="width: 14px;height: 14px"></el-col>
+                        <el-col :class="{'el-icon-like':!i.isLike,'el-icon-liked':i.isLike}"
+                                style="width: 14px;height: 14px"
+                                @click.native="likeReply(index,k)"></el-col>
                         <span>{{ i.likeNum }}</span></el-row>
                     </el-col>
                   </el-row>
@@ -101,12 +104,12 @@
             <el-row>
               <el-col :span="24" style="text-align: center">
                 <el-pagination
-                    small
                     :hide-on-single-page="true"
-                    @current-change="handleCurrentChange"
-                    layout="prev, pager, next"
                     :page-size="5"
-                    :total="item.reply.length">
+                    :total="item.reply.length"
+                    layout="prev, pager, next"
+                    small
+                    @current-change="handleCurrentChange">
                 </el-pagination>
 
 
@@ -121,27 +124,27 @@
         <i class="el-icon-loading"/>
       </div>
     </el-main>
-    <el-footer style="position: fixed;bottom: 0px;width: 74%;opacity: 1;margin: 0 auto;background-color:#ffffff;
-height: 70px" v-if="commentArea">
+    <el-footer v-if="commentArea" style="position: fixed;bottom: 0px;width: 74%;opacity: 1;margin: 0 auto;background-color:#ffffff;
+height: 70px">
       <div>
         <el-row>
           <el-col :span="2" style="text-align: left">
             <el-image
-                style="width: 66px; height: 66px;border-radius: 50%"
+                :fit="'cover'"
                 :src="avatar"
-                :fit="'cover'"></el-image>
+                style="width: 66px; height: 66px;border-radius: 50%"></el-image>
           </el-col>
           <el-col :span="17">
             <el-input
-                style="width: 700px;float: left;margin-top: 6px"
-                type="textarea"
+                v-model="comment.content"
                 :autosize="{ minRows: 2}"
                 :placeholder="comment.tempContent"
-                v-model="comment.content">
+                style="width: 700px;float: left;margin-top: 6px"
+                type="textarea">
             </el-input>
           </el-col>
           <el-col :span="4">
-            <el-button style="height: 50px;margin-top: 6px" type="primary" round @click="postComment">发布</el-button>
+            <el-button round style="height: 50px;margin-top: 6px" type="primary" @click="postComment">发布</el-button>
           </el-col>
         </el-row>
       </div>
@@ -150,22 +153,18 @@ height: 70px" v-if="commentArea">
 </template>
 
 <script>
-import Spinner from 'vue-simple-spinner'
 import {getDate} from "@/util/tools";
 import Unfold from "@/components/Unfold";
 import {
-  getComment,
-  getReply,
-  postComment,
-  postReply,
-  likeComment,
-  likeReply,
   cancelLikeComment,
   cancelLikeReply,
-  getIsLikeComment,
-  getIsLikeReply
+  getComment,
+  getReply,
+  likeComment,
+  likeReply,
+  postComment,
+  postReply
 } from "@/api/Comment";
-import Vue from "vue";
 
 export default {
   name: "Comment",
@@ -177,7 +176,7 @@ export default {
   },
   data() {
     return {
-      userId:'',
+      userId: '',
       comments: [],
       avatar: '',
       comment: {
@@ -212,7 +211,7 @@ export default {
           comments[i].reply = reply
         }
         this.comments.push(...comments);
-        this.isLoading=false
+        this.isLoading = false
         console.log(this.comments.length)
       } catch (err) {
         console.error(err);
@@ -243,24 +242,24 @@ export default {
       this.comments[index].reply = reply.data.reply;
     }
 
-  ,
+    ,
     postComment() {
       let http;
       if (this.comment.type === 0) {
-        http = postComment(this.id, this.comment.content,this.comment.type);
+        http = postComment(this.id, this.comment.content, this.comment.type);
       } else {
         //如果type为2即为三级评论，此时将tempContent插入content头部
         if (this.comment.type === 2) {
           this.comment.content = this.comment.tempContent + this.comment.content
         }
-        http = postReply(this.comment.id, this.comment.content,this.comment.type);
+        http = postReply(this.comment.id, this.comment.content, this.comment.type);
       }
       http.then((res) => {
         if (res.code == 2001) {
           if (this.comment.type === 0) {
             let c = res.data.comment;
             //必须要初始化reply,不如会报各种错误
-            c.reply=[]
+            c.reply = []
             c.username = this.$cookie.get("username");
             c.nickname = this.$cookie.get("nickname");
             c.avatar = this.$cookie.get("avatar");
@@ -318,29 +317,29 @@ export default {
       console.log(reply)
       let start = (page - 1) * size;
       let end = page * size;
-        return reply.slice(start, end)
+      return reply.slice(start, end)
     },
-    likeComment(index){
+    likeComment(index) {
       console.log("评论id")
       console.log(this.comments[index].commentId)
-      if (this.comments[index].isLike){
-        this.comments[index].isLike=false
+      if (this.comments[index].isLike) {
+        this.comments[index].isLike = false
         this.comments[index].likeNum--
         cancelLikeComment(this.comments[index].commentId)
-      }else {
-        this.comments[index].isLike=true
+      } else {
+        this.comments[index].isLike = true
         this.comments[index].likeNum++
         likeComment(this.comments[index].commentId)
       }
     }
     ,
-    likeReply(i,j){
-      if (this.comments[i].reply[j].isLike){
-        this.comments[i].reply[j].isLike=false;
+    likeReply(i, j) {
+      if (this.comments[i].reply[j].isLike) {
+        this.comments[i].reply[j].isLike = false;
         this.comments[i].reply[j].likeNum--
         cancelLikeReply(this.comments[i].reply[j].replyId)
-      }else {
-        this.comments[i].reply[j].isLike=true
+      } else {
+        this.comments[i].reply[j].isLike = true
         this.comments[i].reply[j].likeNum++
         likeReply(this.comments[i].reply[j].replyId)
       }
@@ -348,7 +347,7 @@ export default {
   },
   created() {
     this.avatar = this.$cookie.get("avatar")
-    this.userId=this.$cookie.get("id")
+    this.userId = this.$cookie.get("id")
     this.getComment();
   },
   mounted() {

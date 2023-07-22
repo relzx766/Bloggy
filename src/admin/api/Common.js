@@ -1,38 +1,38 @@
 import {FormPost, Get} from "../../../http";
 
-export const getAdList=async ()=>{
+export const getAdList = async () => {
     return Get({
-        url:'/statistic/ad'
+        url: '/statistic/ad'
     })
 }
-export const addAd=async (ad,image)=>{
-    let data=new FormData
-    data.append("ad",JSON.stringify(ad))
-    data.append("image",image)
+export const addAd = async (ad, image) => {
+    let data = new FormData
+    data.append("ad", JSON.stringify(ad))
+    data.append("image", image)
     return FormPost({
-        url:'/statistic/ad/add',
-        data:data
+        url: '/statistic/ad/add',
+        data: data
     })
 }
-export const updateAd=async (ad,image)=>{
-    let data=new FormData;
-    data.append("ad",JSON.stringify(ad));
-    data.append("image",image);
+export const updateAd = async (ad, image) => {
+    let data = new FormData;
+    data.append("ad", JSON.stringify(ad));
+    data.append("image", image);
     return FormPost({
-        url:'/statistic/ad/update',
-        data:data
+        url: '/statistic/ad/update',
+        data: data
     })
 }
-export const delAd=async (id)=>{
+export const delAd = async (id) => {
     return FormPost({
-        url:'/statistic/ad/delete',
-        data:{
-            id:id
+        url: '/statistic/ad/delete',
+        data: {
+            id: id
         }
     })
 }
-export const getViews=async ()=>{
+export const getViews = async () => {
     return Get({
-        url:'/statistic/view'
+        url: '/statistic/view'
     })
 }

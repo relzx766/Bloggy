@@ -9,13 +9,13 @@
       <div class="block" style="height: 80px;border-top-left-radius: 14px;border-top-right-radius: 14px;
 margin-top: -20px">
         <el-pagination
-            style="color: white;padding-top: 30px;"
-            background
-            @current-change="getPage"
             :current-page.sync="currentPage"
             :page-size="15"
+            :total="total"
+            background
             layout="total, prev, pager, next,jumper"
-            :total="total">
+            style="color: white;padding-top: 30px;"
+            @current-change="getPage">
         </el-pagination>
       </div>
     </el-footer>
@@ -51,8 +51,8 @@ export default {
       })
     }
   },
-  components:{
-    'article-list':ArticleList
+  components: {
+    'article-list': ArticleList
   }
   ,
   created() {

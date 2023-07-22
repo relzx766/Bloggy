@@ -9,10 +9,10 @@
           <el-carousel-item v-for="item in advertising" :key="item">
             <div>
               <el-image
-                  style="width: 100%; height: 300px;border-radius: 10px"
+                  :fit="'cover'"
                   :src="item.image"
-                  @click="toLink(item.url)"
-                  :fit="'cover'"></el-image>
+                  style="width: 100%; height: 300px;border-radius: 10px"
+                  @click="toLink(item.url)"></el-image>
               <h4 class="ad-title">{{ item.slogan }}</h4>
             </div>
           </el-carousel-item>
@@ -22,24 +22,25 @@
         <el-main style="margin-top: 40px;border-radius: 14px">
           <div>
             <el-card>
-            <ul style="text-align: center;display: block">
-              <li class="article-trend" v-for="(item,index) in trend.article" @click="toDetail(item.id)">
-                <a href="#" style="line-height: 30px">
-                  <el-row>
-                    <el-col :span="1">
-                      <el-tag  size="mini">{{index+1}}</el-tag>
-                    </el-col>
-                    <el-col :span="21">
-                      {{item.title}}
-                    </el-col>
-                    <el-col :span="2" style="float: right">
-                      <i class="el-icon-s-marketing"/>
-                      {{item.trend}}
-                    </el-col>
-                  </el-row>
-                </a>
-              </li>
-            </ul></el-card>
+              <ul style="text-align: center;display: block">
+                <li v-for="(item,index) in trend.article" class="article-trend" @click="toDetail(item.id)">
+                  <a href="#" style="line-height: 30px">
+                    <el-row>
+                      <el-col :span="1">
+                        <el-tag size="mini">{{ index + 1 }}</el-tag>
+                      </el-col>
+                      <el-col :span="21">
+                        {{ item.title }}
+                      </el-col>
+                      <el-col :span="2" style="float: right">
+                        <i class="el-icon-s-marketing"/>
+                        {{ item.trend }}
+                      </el-col>
+                    </el-row>
+                  </a>
+                </li>
+              </ul>
+            </el-card>
           </div>
         </el-main>
       </el-container>

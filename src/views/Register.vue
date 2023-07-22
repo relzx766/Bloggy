@@ -10,26 +10,26 @@
 
       <el-form ref="userForm" :model="userForm" :rules="rules">
         <el-form-item prop="account">
-          <el-input placeholder="用户名" v-model="userForm.username"></el-input>
+          <el-input v-model="userForm.username" placeholder="用户名"></el-input>
         </el-form-item>
 
         <el-form-item prop="nickname">
-          <el-input placeholder="密码" v-model="userForm.password"></el-input>
+          <el-input v-model="userForm.password" placeholder="密码"></el-input>
         </el-form-item>
 
         <el-form-item prop="password">
-          <el-input placeholder="邮箱" v-model="userForm.email"></el-input>
+          <el-input v-model="userForm.email" placeholder="邮箱"></el-input>
         </el-form-item>
 
-        <el-form-item size="small" class="me-login-button">
+        <el-form-item class="me-login-button" size="small">
           <el-button type="primary" @click.native.prevent="register('userForm')">注册</el-button>
         </el-form-item>
         <el-dialog
-            title="验证"
-            :visible.sync="dialogVisible"
             :close-on-click-modal="false"
             :close-on-press-escape="true"
             :show-close="true"
+            :visible.sync="dialogVisible"
+            title="验证"
             width="30%">
           <span>验证码已发至您的邮箱，请注意查收</span>
           <el-input v-model="code" placeholder="请输入验证码"></el-input>
@@ -43,7 +43,7 @@
       <div class="me-login-design">
         <p>已有账号？
           <strong>
-            <router-link to="/login" class="me-login-design-color">去登录</router-link>
+            <router-link class="me-login-design-color" to="/login">去登录</router-link>
           </strong>
         </p>
       </div>

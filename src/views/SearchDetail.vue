@@ -6,27 +6,27 @@
     <el-main style="width: 70%;margin: 0 auto;">
       <el-tabs v-model="activeName">
         <el-tab-pane label="文章" name="first">
-          <el-container v-if="articleTotal>0" >
+          <el-container v-if="articleTotal>0">
             <el-main>
               <article-list :articles="articles"/>
             </el-main>
             <el-footer>
               <el-pagination
-                  style="color: white;padding-top: 30px;"
-                  background
-                  @current-change="chooseSearchType"
                   :current-page.sync="articlePage"
                   :page-size="15"
+                  :total="articleTotal"
+                  background
                   layout="total, prev, pager, next,jumper"
-                  :total="articleTotal">
+                  style="color: white;padding-top: 30px;"
+                  @current-change="chooseSearchType">
               </el-pagination>
             </el-footer>
-          </el-container >
-          <el-empty description="空空如也" v-else></el-empty>
+          </el-container>
+          <el-empty v-else description="空空如也"></el-empty>
         </el-tab-pane>
         <el-tab-pane label="用户" name="third">
-          <user-list :users="users"  v-if="users.length>0"/>
-          <el-empty description="空空如也" v-else></el-empty>
+          <user-list v-if="users.length>0" :users="users"/>
+          <el-empty v-else description="空空如也"></el-empty>
 
         </el-tab-pane>
       </el-tabs>
@@ -36,9 +36,8 @@
 
 <script>
 import Navigation from "@/components/Navigation";
-import {getByTag, fuzzySearch} from "@/api/Article";
+import {fuzzySearch, getByTag} from "@/api/Article";
 import ArticleList from "@/components/ArticleList";
-import SortList from "@/components/SortList.vue";
 import UserList from "@/components/UserList.vue";
 import {searchUser} from "@/api/User";
 

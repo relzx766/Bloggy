@@ -1,6 +1,6 @@
 <template>
 
-  <div id="login" v-title data-title="登录 - Bloggy" >
+  <div id="login" v-title data-title="登录 - Bloggy">
     <!--<video preload="auto" class="me-video-player" autoplay="autoplay" loop="loop">
           <source src="../../static/vedio/sea.mp4" type="video/mp4">
       </video>-->
@@ -11,21 +11,21 @@
       <el-form ref="userForm" :model="userForm" :rules="rules">
 
         <el-form-item prop="account">
-          <el-input placeholder="用户名或邮箱" v-model="userForm.account"></el-input>
+          <el-input v-model="userForm.account" placeholder="用户名或邮箱"></el-input>
         </el-form-item>
 
         <el-form-item prop="password">
-          <el-input placeholder="密码" type="password" v-model="userForm.password"></el-input>
+          <el-input v-model="userForm.password" placeholder="密码" type="password"></el-input>
         </el-form-item>
 
-        <el-form-item size="small" class="me-login-button">
+        <el-form-item class="me-login-button" size="small">
           <el-button type="primary" @click.native.prevent="login('userForm')">登录</el-button>
         </el-form-item>
       </el-form>
       <div class="me-login-design">
         <p>还没有账号？
           <strong>
-            <router-link to="/register" class="me-login-design-color">去注册</router-link>
+            <router-link class="me-login-design-color" to="/register">去注册</router-link>
           </strong>
         </p>
       </div>
@@ -36,6 +36,7 @@
 
 <script>
 import {login} from "@/api/User";
+
 export default {
   name: 'Login',
   data() {
@@ -45,10 +46,10 @@ export default {
         password: ''
       },
       rules: {
-      /*  password: [
-          {required: true, message: '请输入密码', trigger: 'blur'},
-          {min: 6, message: '不能小于6个字符', trigger: 'blur'}
-        ]*/
+        /*  password: [
+            {required: true, message: '请输入密码', trigger: 'blur'},
+            {min: 6, message: '不能小于6个字符', trigger: 'blur'}
+          ]*/
       }
     }
   },
@@ -57,39 +58,39 @@ export default {
       let that = this;
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          login(that.userForm).then((res)=>{
-            if (res.code===2001) {
-              let role=res.data.user.role
-              localStorage.setItem(res.data.token.tokenName,res.data.token.tokenValue)
-              that.$cookie.set("id",res.data.user.id,24*60*60*30)
-              that.$cookie.set("username",res.data.user.username,24*60*60*30)
-              that.$cookie.set("nickname",res.data.user.nickname,24*60*60*30)
-              that.$cookie.set("avatar",res.data.user.avatar,24*60*60*30)
-              that.$cookie.set("role",res.data.user.role,24*60*60*30)
+          login(that.userForm).then((res) => {
+            if (res.code === 2001) {
+              let role = res.data.user.role
+              localStorage.setItem(res.data.token.tokenName, res.data.token.tokenValue)
+              that.$cookie.set("id", res.data.user.id, 24 * 60 * 60 * 30)
+              that.$cookie.set("username", res.data.user.username, 24 * 60 * 60 * 30)
+              that.$cookie.set("nickname", res.data.user.nickname, 24 * 60 * 60 * 30)
+              that.$cookie.set("avatar", res.data.user.avatar, 24 * 60 * 60 * 30)
+              that.$cookie.set("role", res.data.user.role, 24 * 60 * 60 * 30)
               that.$notify({
                 title: "Bloggy",
                 message: res.message,
                 type: "success",
-                duration:1000
+                duration: 1000
               })
-              if (role==="member") {
+              if (role === "member") {
                 that.$router.push("/index")
-              }else if (role==="admin"){
-                that.$router.push("/admin/index")
-              }else {
+              } else if (role === "admin") {
+                that.$router.push("/admin")
+              } else {
                 that.$notify({
                   title: "Bloggy",
                   message: "error",
                   type: "error",
-                  duration:1000
+                  duration: 1000
                 })
               }
-            }else {
+            } else {
               that.$notify({
                 title: "Bloggy",
                 message: res.message,
                 type: "error",
-                duration:1000
+                duration: 1000
               })
             }
           })

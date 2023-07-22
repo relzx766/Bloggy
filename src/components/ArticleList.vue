@@ -1,38 +1,43 @@
 <template>
-  <div> <div v-for="(item,index) in articles" @click="toDetail(item.id)">
-    <el-row style="height: 40px;">
-      <el-col :span="2" style="text-align: left">
-        <el-avatar :src="item.userVo.avatar">
-        </el-avatar>
-      </el-col>
-      <el-col :span="16" style="float: left;margin-left: -3%">
+  <div>
+    <div v-for="(item,index) in articles" @click="toDetail(item.id)">
+      <el-row style="height: 40px;">
+        <el-col :span="2" style="text-align: left">
+          <el-avatar :src="item.userVo.avatar">
+          </el-avatar>
+        </el-col>
+        <el-col :span="16" style="float: left;margin-left: -3%">
+          <el-breadcrumb separator="|">
+            <el-breadcrumb-item class="text-item">{{ item.userVo.nickname }}</el-breadcrumb-item>
+            <el-breadcrumb-item class="text-item">{{ getData(item.createTime) }}</el-breadcrumb-item>
+            <el-breadcrumb-item v-for="i in item.tags.length>3?3:item.tags.length"
+                                class="text-item">
+              {{ item.tags[i - 1] }}
+            </el-breadcrumb-item>
+          </el-breadcrumb>
+        </el-col>
+      </el-row>
+      <el-row>
+        <h3 style="text-align: left">{{ item.title }}</h3>
+      </el-row>
+      <el-row style="text-align: left">
+        {{ item.description }}
+      </el-row>
+      <el-row style="height: 40px">
         <el-breadcrumb separator="|">
-          <el-breadcrumb-item class="text-item">{{ item.userVo.nickname }}</el-breadcrumb-item>
-          <el-breadcrumb-item class="text-item">{{ getData(item.createTime) }}</el-breadcrumb-item>
-          <el-breadcrumb-item class="text-item"
-                              v-for="i in item.tags.length>3?3:item.tags.length">
-            {{item.tags[i-1] }}
+          <el-breadcrumb-item class="text-item">
+            <i class="el-icon-view"/>
+            {{ item.views }}
           </el-breadcrumb-item>
-        </el-breadcrumb></el-col>
-    </el-row>
-    <el-row>
-      <h3 style="text-align: left">{{ item.title }}</h3>
-    </el-row>
-    <el-row style="text-align: left">
-      {{item.description}}
-    </el-row>
-    <el-row style="height: 40px">
-      <el-breadcrumb separator="|">
-        <el-breadcrumb-item class="text-item">
-          <i class="el-icon-view"/>
-          {{ item.views}}</el-breadcrumb-item>
-        <el-breadcrumb-item class="text-item">
-          <i class="el-icon-chat-dot-square"/>
-          {{ item.comments}} </el-breadcrumb-item>
-      </el-breadcrumb>
-    </el-row>
-    <el-divider v-if="index<articles.length-1"></el-divider>
-  </div></div>
+          <el-breadcrumb-item class="text-item">
+            <i class="el-icon-chat-dot-square"/>
+            {{ item.comments }}
+          </el-breadcrumb-item>
+        </el-breadcrumb>
+      </el-row>
+      <el-divider v-if="index<articles.length-1"></el-divider>
+    </div>
+  </div>
 
 </template>
 
@@ -40,11 +45,11 @@
 import {getDate} from "@/util/tools";
 
 export default {
-name: "ArticleList",
-  props:{
-  articles:Array
+  name: "ArticleList",
+  props: {
+    articles: Array
   },
-  methods:{
+  methods: {
     toDetail(id) {
       this.$router.push("/detail?id=" + id);
     },

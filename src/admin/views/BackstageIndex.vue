@@ -1,22 +1,34 @@
 <template>
-<el-container>
-  <el-header >
-    <navigation/>
-  </el-header>
-  <el-main>
+  <div>
+    <el-row>
+      <navigation/>
+    </el-row>
     <el-row>
       <el-col :span="2">
-        <left-navigation/>
+        <el-menu active-text-color="#000000" default-active="1" style="height: 100vh;"
+        >
+          <el-menu-item index="1" @click="linkTo('/admin/board')">
+            仪表盘
+          </el-menu-item>
+          <el-menu-item index="2" @click="linkTo('/admin/article')">
+            文章管理
+          </el-menu-item>
+          <el-menu-item index="3" @click="linkTo('/admin/user')">
+            用户管理
+          </el-menu-item>
+          <el-menu-item index="4" @click="linkTo('/admin/ad')">
+            广告管理
+          </el-menu-item>
+
+        </el-menu>
       </el-col>
       <el-col :span="22">
-        <router-view></router-view>
+        <router-view style="height: 100vh;background-color: whitesmoke;"></router-view>
       </el-col>
     </el-row>
 
 
-
-  </el-main>
-</el-container>
+  </div>
 </template>
 
 <script>
@@ -29,17 +41,22 @@ import LeftNavigation from "@/admin/components/LeftNavigation.vue";
 
 export default {
   name: "BackstageIndex",
-  components:{
-    'navigation':BackNavigation,
-    'user-manage':UserManage,
-    'article-manage':ArticleManage,
-    'ad-manage':AdvertisingManage,
-    'dash-board':DashBoard,
-    'left-navigation':LeftNavigation
+  components: {
+    'navigation': BackNavigation,
+    'user-manage': UserManage,
+    'article-manage': ArticleManage,
+    'ad-manage': AdvertisingManage,
+    'dash-board': DashBoard,
+    'left-navigation': LeftNavigation
+  },
+  methods: {
+    linkTo(url) {
+      this.$router.push(url);
+    }
   },
   created() {
-    let role=this.$cookie.get("role");
-    if (role!=="admin"){
+    let role = this.$cookie.get("role");
+    if (role !== "admin") {
       this.$router.push("/index")
     }
   }
@@ -47,7 +64,12 @@ export default {
 </script>
 
 <style scoped>
-body{
-  background-color: #f4f4f4;
+html {
+  padding: 0;
 }
+
+.el-menu-item.is-active {
+  background-color: #289cfc !important;
+}
+
 </style>

@@ -1,89 +1,89 @@
 import {FormPost, Get, JsonPost} from "../../http";
 
-export const getArticlePage=async (page)=>{
+export const getArticlePage = async (page) => {
     return Get({
-        url:'/article/page',
+        url: '/article/page',
         params: {page}
     })
 }
-export const getArticleDetail=async (id)=>{
+export const getArticleDetail = async (id) => {
     return Get({
-        url:'/article/detail',
-        params:{id}
+        url: '/article/detail',
+        params: {id}
     })
 }
-export const getArticleTrend=async ()=>{
+export const getArticleTrend = async () => {
     return Get({
-        url:"/statistic/article"
+        url: "/statistic/article"
     })
 }
-export const postArticle=async (data={})=>{
+export const postArticle = async (data = {}) => {
     return JsonPost({
-        url:"/article/publish",
+        url: "/article/publish",
         data: data
     })
 }
-export const getArticleIsLike=async (id)=>{
+export const getArticleIsLike = async (id) => {
     return Get({
-        url:'/article/like/get',
-        params:{id}
+        url: '/article/like/get',
+        params: {id}
     })
 }
-export const likeArticle=async (id)=>{
+export const likeArticle = async (id) => {
     return Get({
-        url:'/article/like',
-        params:{id}
+        url: '/article/like',
+        params: {id}
     })
 }
-export const cancelLikeArticle=async (id)=>{
+export const cancelLikeArticle = async (id) => {
     return Get({
-        url:'/article/like/cancel',
-        params:{id}
+        url: '/article/like/cancel',
+        params: {id}
     })
 }
-export const getUserArticleList=async (id,page)=>{
+export const getUserArticleList = async (id, page) => {
     return Get({
-        url:'/article/user',
-        params:{id,page}
+        url: '/article/user',
+        params: {id, page}
     })
 }
-export const getUserTimeline=async (id)=>{
+export const getUserTimeline = async (id) => {
     return Get({
-        url:'/article/user/year',
-        params:{id}
+        url: '/article/user/year',
+        params: {id}
     })
 }
-export const getUserArticleByYear=async (id,year)=>{
+export const getUserArticleByYear = async (id, year) => {
     return Get({
-        url:'/article/user/year',
-        params:{id,year}
+        url: '/article/user/year',
+        params: {id, year}
     })
 }
-export const deleteArticle=async (id)=>{
+export const deleteArticle = async (id) => {
     return FormPost({
-        url:'/article/delete',
-        data:{
-            id:id
+        url: '/article/delete',
+        data: {
+            id: id
         }
     })
 }
-export const getByTag=async (data)=>{
+export const getByTag = async (data) => {
     return FormPost({
-        url:'/article/tag',
-        data:data
+        url: '/article/tag',
+        data: data
     })
 }
-export const fuzzySearch=async (keyword,page)=>{
+export const fuzzySearch = async (keyword, page) => {
     return Get({
-        url:'/article/search',
-        params:{
-            keyword,page
+        url: '/article/search',
+        params: {
+            keyword, page
         }
     })
 }
-export const update=async (data={})=>{
+export const update = async (data = {}) => {
     return JsonPost({
-        url:'/article/update',
-        data:data
+        url: '/article/update',
+        data: data
     })
 }

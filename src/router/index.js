@@ -61,27 +61,27 @@ const routes = [
         component: ArticleDetail
     },
     {
-        path:'/profile',
-        name:'profile',
+        path: '/profile',
+        name: 'profile',
         component: Profile
     },
     {
-        path:'/search',
+        path: '/search',
         name: 'search',
         component: SearchDetail
     },
     {
         path: '/detail/sort',
-        name:'detail/sort',
+        name: 'detail/sort',
         component: SortDetail
     },
     {
-        path:'/admin',
+        path: '/admin',
         component: BackstageIndex,
-        children:[
+        children: [
             {
-                path:'article',
-                component:ArticleManage
+                path: 'article',
+                component: ArticleManage
             },
             {
                 path: 'user',
@@ -92,7 +92,7 @@ const routes = [
                 component: AdvertisingManage
             },
             {
-                path:'board',
+                path: 'board',
                 component: DashBoard
             }
 
@@ -109,10 +109,10 @@ const router = new VueRouter({
     mode: 'history',
     routes: routes
 })
-router.beforeEach((to,from,next)=>{
-    if (to.matched.length===0){
-        next({name:'NotFound'})
-    }else {
+router.beforeEach((to, from, next) => {
+    if (to.matched.length === 0) {
+        next({name: 'NotFound'})
+    } else {
         next()
     }
 })

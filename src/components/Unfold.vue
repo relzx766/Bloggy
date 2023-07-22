@@ -1,11 +1,11 @@
 <template>
 <span style="width: 100%">
     <span v-if="data.length<maxLen">
-        <div class="content"><span v-if="type===2" style="font-weight: bolder">回复</span> {{data}}</div>
+        <div class="content"><span v-if="type===2" style="font-weight: bolder">回复</span> {{ data }}</div>
     </span>
     <span v-else>
-        <div class="content">{{showBtn?sliceStr:data}}
-            <span class="btnWord" @click="showBtn=!showBtn">{{showBtn?tip:"收起"}}</span>
+        <div class="content">{{ showBtn ? sliceStr : data }}
+            <span class="btnWord" @click="showBtn=!showBtn">{{ showBtn ? tip : "收起" }}</span>
         </div>
     </span>
 </span>
@@ -20,9 +20,9 @@ export default {
     }
   },
   props: {
-    tip:{
-      type:String,
-      default:'展开'
+    tip: {
+      type: String,
+      default: '展开'
     },
     // 数据
     data: {
@@ -34,7 +34,7 @@ export default {
       type: Number,
       default: 80
     },
-    type:Number
+    type: Number
   },
   computed: {
     sliceStr() {
@@ -47,15 +47,16 @@ export default {
 }
 </script>
 
-<style  scoped>
-.content{
+<style scoped>
+.content {
   width: 90%;
-  word-wrap:break-word;
-  word-break:normal;
+  word-wrap: break-word;
+  word-break: normal;
   text-align: left;
   font-size: 14px;
 }
-.btnWord{
+
+.btnWord {
   color: #449cfc;
   font-size: 14px;
 }

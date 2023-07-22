@@ -7,11 +7,11 @@
       <div id="main">
         <div id="userInfo">
           <el-card class="info-card">
-            <el-row >
+            <el-row>
               <el-col :span="12">
                 <el-row>
                   <el-col :span="5">
-                    <el-avatar :size="100" shape="circle" :src="article.userVo.avatar"/>
+                    <el-avatar :size="100" :src="article.userVo.avatar" shape="circle"/>
                   </el-col>
                   <el-col :span="14" style="text-align: left">
                     <el-row><h3>{{ article.userVo.nickname }}</h3></el-row>
@@ -33,7 +33,8 @@
         <div id="title" style="margin-bottom: 8px;text-align: center">
           <h1 style="font-size: 28px">{{ article.title }}</h1>
         </div>
-        <div id="article-info" style="font-size: 10px;font-weight: lighter;height: 14px;margin-top: 6px;text-align: center">
+        <div id="article-info"
+             style="font-size: 10px;font-weight: lighter;height: 14px;margin-top: 6px;text-align: center">
           <span>{{ article.views }}阅读</span>
           <span>{{ article.comments }}评论</span>
           <span>{{ article.likeNum }}喜欢</span>
@@ -41,12 +42,12 @@
         </div>
         <div id="content">
           <mavon-editor
-              v-model="article.content"
               ref="md"
-              :subfield="false"
-              defaultOpen="preview"
-              :toolbarsFlag="false"
+              v-model="article.content"
               :editable="false"
+              :subfield="false"
+              :toolbarsFlag="false"
+              defaultOpen="preview"
               style="z-index: 5"
           ></mavon-editor>
         </div>
@@ -55,11 +56,11 @@
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <el-row>
-          <el-col :span="8" style="margin-top: 10px"><span>最后编辑于:{{ time }}</span></el-col>
+              <el-col :span="8" style="margin-top: 10px"><span>最后编辑于:{{ time }}</span></el-col>
               <el-col :span="16" style="text-align: right;">
                 <el-button circle @click="like">
-                <i :class="{'el-icon-like':!article.isLike,'el-icon-liked':article.isLike}"></i>
-              </el-button>
+                  <i :class="{'el-icon-like':!article.isLike,'el-icon-liked':article.isLike}"></i>
+                </el-button>
                 <span>{{ article.likeNum }}</span>
                 <el-button circle>
                   <i class="el-icon-comment"></i>
@@ -67,12 +68,13 @@
                 </el-button>
                 <span>{{ article.comments }}</span>
                 <el-button circle @click="chooseSortAction">
-                  <i class="el-icon-sort" :class="{'el-icon-sort':!article.isSort,'el-icon-sorted':article.isSort}"></i>
-                </el-button></el-col>
-              </el-row>
+                  <i :class="{'el-icon-sort':!article.isSort,'el-icon-sorted':article.isSort}" class="el-icon-sort"></i>
+                </el-button>
+              </el-col>
+            </el-row>
             <el-dialog
-                title="收藏"
                 :visible.sync="dialogVisible"
+                title="收藏"
                 width="20%"
             >
               <div>
@@ -80,12 +82,12 @@
                   <el-main>
                     <el-radio-group v-model="choose">
                       <el-row v-for="item in sorts" style="margin-top: 8px">
-                        <el-radio  :label="item.id">{{item.title}}</el-radio>
+                        <el-radio :label="item.id">{{ item.title }}</el-radio>
                       </el-row>
                     </el-radio-group>
                   </el-main>
                   <el-footer>
-                    <el-input placeholder="新建收藏夹" v-model="sortTitle" maxlength="15">
+                    <el-input v-model="sortTitle" maxlength="15" placeholder="新建收藏夹">
                       <el-button slot="append" icon="el-icon-circle-plus" @click="createSort"></el-button>
                     </el-input>
                   </el-footer>
@@ -98,8 +100,10 @@
             </el-dialog>
           </div>
 
-        <el-link  v-for="tag in article.tags" @click.native="searchByTag(tag)"><el-tag>{{ tag }}
-        </el-tag></el-link>
+          <el-link v-for="tag in article.tags" @click.native="searchByTag(tag)">
+            <el-tag>{{ tag }}
+            </el-tag>
+          </el-link>
         </el-card>
       </div>
       <el-card class="box-card" style="width: 80%;margin: 0 auto;">
@@ -115,13 +119,13 @@
 </template>
 
 <script>
-import {getArticleDetail, likeArticle, cancelLikeArticle} from "@/api/Article";
-import {marked} from "marked"
+import {cancelLikeArticle, getArticleDetail, likeArticle} from "@/api/Article";
 import Navigation from "@/components/Navigation";
 import Unfold from "@/components/Unfold";
-import {getDate,getCount} from "@/util/tools";
+import {getCount, getDate} from "@/util/tools";
 import Comment from "@/components/Comment";
-import {createSort,append,getByUser,cancelSort} from "@/api/Sort";
+import {append, cancelSort, createSort, getByUser} from "@/api/Sort";
+
 export default {
   name: "ArticleDetail",
   data() {
@@ -131,13 +135,13 @@ export default {
       relation: '+ 关注',
       flag: 0,
       time: '',
-     type:0,
-      dialogVisible:false,
-      choose:String,
-      userId:String,
-      sorts:[],
-      sortTitle:'',
-      sortPlaceholder:'新建收藏夹',
+      type: 0,
+      dialogVisible: false,
+      choose: String,
+      userId: String,
+      sorts: [],
+      sortTitle: '',
+      sortPlaceholder: '新建收藏夹',
 
     }
   },
@@ -153,9 +157,9 @@ export default {
           this.article.updateTime = (new Date(this.article.createTime)).toLocaleString()
           this.time = this.article.updateTime
         }
-        this.article.views=getCount( this.article.views);
-        this.article.likeNum=getCount(this.article.likeNum);
-        this.article.comments=getCount(this.article.comments)
+        this.article.views = getCount(this.article.views);
+        this.article.likeNum = getCount(this.article.likeNum);
+        this.article.comments = getCount(this.article.comments)
         console.log(this.article)
       })
     },
@@ -186,69 +190,69 @@ export default {
     getDate(date) {
       return getDate(date);
     },
-    changeType(){
-      this.type=1;
-      this.type=0;
+    changeType() {
+      this.type = 1;
+      this.type = 0;
     },
-    searchByTag(tag){
-      tag='#'+tag+'#'
-      this.$router.push("/search?keyword="+encodeURIComponent(tag));
+    searchByTag(tag) {
+      tag = '#' + tag + '#'
+      this.$router.push("/search?keyword=" + encodeURIComponent(tag));
     },
-    getSorts(){
-      this.dialogVisible=true;
-      getByUser(this.userId).then((res)=>{
-        this.sorts=res.data.sorts
+    getSorts() {
+      this.dialogVisible = true;
+      getByUser(this.userId).then((res) => {
+        this.sorts = res.data.sorts
       })
     },
-    createSort(){
-      createSort(this.sortTitle).then((res)=>{
-        if (res.code===2001){
-          this.sortTitle=''
-          this.sortPlaceholder='新建收藏夹'
+    createSort() {
+      createSort(this.sortTitle).then((res) => {
+        if (res.code === 2001) {
+          this.sortTitle = ''
+          this.sortPlaceholder = '新建收藏夹'
           this.sorts.push(res.data.sort)
-        }else {
+        } else {
           this.$notify({
             title: "Bloggy",
             message: res.message,
             type: "error",
-            duration:1000
+            duration: 1000
           })
         }
       })
     },
-    appendArticleToSort(){
-      append(this.choose,this.id).then((res)=>{
-        if (res.code===2001){
-          this.article.isSort=true
-          this.dialogVisible=false
-        }else {
+    appendArticleToSort() {
+      append(this.choose, this.id).then((res) => {
+        if (res.code === 2001) {
+          this.article.isSort = true
+          this.dialogVisible = false
+        } else {
           this.$notify({
             title: "Bloggy",
             message: res.message,
             type: "error",
-            duration:1000
+            duration: 1000
           })
         }
       })
     },
-    cancelSort(){
-      cancelSort(this.id).then((res)=>{
-        if (res.code===2001){
-          this.article.isSort=false
-        }else {
+    cancelSort() {
+      cancelSort(this.id).then((res) => {
+        if (res.code === 2001) {
+          this.article.isSort = false
+        } else {
           this.$notify({
             title: "Bloggy",
             message: res.message,
             type: "error",
-            duration:1000
+            duration: 1000
           })
         }
       })
     },
-    chooseSortAction(){
-      if (this.article.isSort){
+    chooseSortAction() {
+      if (this.article.isSort) {
         this.cancelSort()
-      }else {
+      } else {
         this.getSorts()
       }
     }
@@ -264,7 +268,7 @@ export default {
     this.getDetail(id)
   },
   created() {
-    this.userId=this.$cookie.get("id")
+    this.userId = this.$cookie.get("id")
   }
 }
 </script>
@@ -275,9 +279,11 @@ li {
   float: left;
   text-align: left;
 }
-.el-link+.el-link{
+
+.el-link + .el-link {
   margin-left: 4px;
 }
+
 li + li {
   margin-left: 10px;
 }
@@ -310,7 +316,8 @@ span + span {
 .comments {
   margin-left: 10px;
 }
-::v-deep .el-icon-view{
+
+::v-deep .el-icon-view {
   background: url('../static/images/view.svg') center no-repeat;
   font-size: 20px;
   background-size: cover;
@@ -321,6 +328,7 @@ span + span {
   font-size: 20px;
   visibility: hidden;
 }
+
 ::v-deep .el-icon-like {
   background: url('../static/images/like.svg') center no-repeat;
   font-size: 20px;
@@ -368,16 +376,19 @@ span + span {
   font-size: 20px;
   visibility: hidden;
 }
+
 ::v-deep .el-icon-sorted {
   background: url('../static/images/document_fill.svg') center no-repeat;
   font-size: 20px;
   background-size: cover;
 }
+
 ::v-deep .el-icon-sorted:before {
   content: "替";
   font-size: 20px;
   visibility: hidden;
 }
+
 .el-button {
   border: none;
   margin-left: 10px;

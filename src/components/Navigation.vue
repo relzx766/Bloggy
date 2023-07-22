@@ -1,17 +1,17 @@
 <template>
   <div id="nav">
     <div id="content">
-      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
-               style="border-bottom-left-radius: 14px;border-bottom-right-radius: 14px;height: 80px;
+      <el-menu :default-active="activeIndex" active-text-color="#449cfc" class="el-menu-demo"
+               mode="horizontal" style="border-bottom-left-radius: 14px;border-bottom-right-radius: 14px;height: 80px;
 
-" active-text-color="#449cfc"
+"
       >
         <el-menu-item><img class="menu-img" src="../static/images/logo.svg"></el-menu-item>
         <el-menu-item style="font-size: 26px;color: #449cfc">Bloggy</el-menu-item>
-       <el-menu-item index="1" style="margin-left: 15%;" @click="changePage('1')"> 主页</el-menu-item>
-      <el-menu-item index="2"  @click="changePage('2')">趋势</el-menu-item>
+        <el-menu-item index="1" style="margin-left: 15%;" @click="changePage('1')"> 主页</el-menu-item>
+        <el-menu-item index="2" @click="changePage('2')">趋势</el-menu-item>
         <el-menu-item style="margin-left: 6%">
-          <el-input placeholder="输入以搜索" v-model="keyword" class="input-with-select">
+          <el-input v-model="keyword" class="input-with-select" placeholder="输入以搜索">
             <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
           </el-input>
 
@@ -22,16 +22,16 @@
         <el-menu-item v-if="!isLogin" style="color: #449cfc;float: right">
           <router-link to="/login">登录</router-link>
         </el-menu-item>
-        <el-submenu index="4" v-if="isLogin" style="float: right">
+        <el-submenu v-if="isLogin" index="4" style="float: right">
           <template slot="title">
-            <el-avatar :size="'medium'" :src="avatar" ></el-avatar>
+            <el-avatar :size="'medium'" :src="avatar"></el-avatar>
           </template>
           <el-menu-item-group>
             <el-menu-item index="4-1" @click="toProfile(userId)">
               <i class="el-icon-user-solid"/>
               <span>个人中心</span>
             </el-menu-item>
-            <el-menu-item @click="signOut" index="4-2">
+            <el-menu-item index="4-2" @click="signOut">
               <i class="el-icon-switch-button"/>
               <span>退出</span>
             </el-menu-item>
@@ -46,10 +46,10 @@
 <script>
 export default {
   name: "Navigation",
-  props:{
-    activeIndex:{
-      type:String,
-      default(){
+  props: {
+    activeIndex: {
+      type: String,
+      default() {
         return '1'
       }
     }
@@ -58,13 +58,13 @@ export default {
     return {
       keyword: '',
       isLogin: false,
-      currentIndex:'1',
-      avatar:'',
-      userId:'',
+      currentIndex: '1',
+      avatar: '',
+      userId: '',
     }
   },
   methods: {
-    signOut(){
+    signOut() {
       localStorage.removeItem("satoken")
       this.$cookie.delete("id")
       this.$cookie.delete("username")
@@ -72,32 +72,32 @@ export default {
       this.$cookie.delete("avatar")
       this.$router.push("/login")
     },
-    changePage(index){
-      console.log("改变页面",index)
-      this.currentIndex=index
-      if (index=='1'){
+    changePage(index) {
+      console.log("改变页面", index)
+      this.currentIndex = index
+      if (index == '1') {
         this.$router.push("/index")
       }
-      if (index=='2'){
+      if (index == '2') {
         this.$router.push('/trend')
       }
-      if (index=='3'){
+      if (index == '3') {
         this.$router.push('/write')
       }
     },
-    toProfile(id){
-      this.$router.push("/profile?id="+id)
+    toProfile(id) {
+      this.$router.push("/profile?id=" + id)
     },
-    search(){
-      if (this.keyword.length>0) {
+    search() {
+      if (this.keyword.length > 0) {
         this.$router.push("/search?keyword=" + encodeURIComponent(this.keyword))
         this.$forceUpdate()
       }
     }
   },
   created() {
-    this.avatar=this.$cookie.get("avatar")
-    this.userId=this.$cookie.get("id");
+    this.avatar = this.$cookie.get("avatar")
+    this.userId = this.$cookie.get("id");
   }
   ,
   beforeMount() {

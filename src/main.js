@@ -7,15 +7,16 @@ import VueCookies from 'vue-cookie'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 import * as echarts from 'echarts'
+
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(VueCookies)
 Vue.use(mavonEditor)
-Vue.prototype.$echarts=echarts
+Vue.prototype.$echarts = echarts
 Vue.directive('click-outside', {
     // 初始化指令
-    bind (el, binding) {
-        function clickHandler (e) {
+    bind(el, binding) {
+        function clickHandler(e) {
             // 这里判断点击的元素是否是本身，是本身，则返回
             if (el.contains(e.target)) {
                 return false
@@ -26,12 +27,14 @@ Vue.directive('click-outside', {
                 binding.value(e)
             }
         }
+
         // 给当前元素绑定个私有变量，方便在unbind中可以解除事件监听
         el.__vueClickOutside__ = clickHandler
         document.addEventListener('click', clickHandler)
     },
-    update () {},
-    unbind (el) {
+    update() {
+    },
+    unbind(el) {
         // 解除事件监听
         document.removeEventListener('click', el.__vueClickOutside__)
         delete el.__vueClickOutside__
