@@ -175,6 +175,11 @@ public class ArticleController {
         return Result.ok(data);
     }
 
+    @GetMapping("/count")
+    public Result getCount() {
+        return new Result().success().put("all", articleService.getRecordCount()).put("active", articleService.getActiveCount());
+    }
+
     @GetMapping("/count/{num}")
     public Result getCountRange(@PathVariable("num") Integer num) {
         return new Result().success().put("records", articleService.getCountRangeByDate(num));
