@@ -9,8 +9,11 @@
 ## 主页
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/75ece1fb-0972-458d-9f3c-36535458bc85)
 ## 文章详情（关注还没有实现）
-![image](https://github.com/relzx766/Bloggy/assets/81310484/b24ebe42-c195-48e7-962f-0c9d323d81dd)
-![image](https://github.com/relzx766/Bloggy/assets/81310484/86b8ac2b-f176-4627-8492-feda0f473410)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/768e473a-8e18-4c4e-b3a6-b661d2082d36)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/bbf36f6b-ac56-4108-bfae-af737b12ebe7)
+使用mavoneditor自己的md转义替换marked后，代码可以高亮了
+![image](https://github.com/relzx766/Bloggy/assets/81310484/eabf4dbf-2f64-4c5c-8b50-63d76b2817eb)
+
 ## 评论
 有一级评论和二级评论，二级评论会分页
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/e1907bce-2385-49d8-bb15-e38b625b5896)
