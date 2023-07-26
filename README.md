@@ -1,4 +1,4 @@
-# Bloggy
+# Bloggy	
 用springboot+vue实现的博客系统
 后端在master，前端在app
 ## 登录页
@@ -9,8 +9,11 @@
 ## 主页
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/75ece1fb-0972-458d-9f3c-36535458bc85)
 ## 文章详情（关注还没有实现）
-![image](https://github.com/relzx766/Bloggy/assets/81310484/b24ebe42-c195-48e7-962f-0c9d323d81dd)
-![image](https://github.com/relzx766/Bloggy/assets/81310484/86b8ac2b-f176-4627-8492-feda0f473410)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/768e473a-8e18-4c4e-b3a6-b661d2082d36)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/bbf36f6b-ac56-4108-bfae-af737b12ebe7)
+使用mavoneditor自己的md转义替换marked后，代码可以高亮了
+![image](https://github.com/relzx766/Bloggy/assets/81310484/eabf4dbf-2f64-4c5c-8b50-63d76b2817eb)
+
 ## 评论
 有一级评论和二级评论，二级评论会分页
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/e1907bce-2385-49d8-bb15-e38b625b5896)
@@ -34,11 +37,16 @@
 ![image](https://github.com/relzx766/Bloggy/assets/81310484/487a3bd0-9a6f-48be-84c6-355f1f64343a)
 ## 后台
 ### 用户管理
-![image](https://github.com/relzx766/Bloggy/assets/81310484/43141994-d597-4a67-afbe-42f7ff7d1008)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/711ea556-d131-4879-a02e-db753262c61f)
+
 ### 文章管理
-![image](https://github.com/relzx766/Bloggy/assets/81310484/d1e3b0c3-6963-4b73-928e-f98a605d2e7e)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/4d58d7de-0e1e-4670-9d10-456344d7f66c)
+
 ### 广告管理
-![image](https://github.com/relzx766/Bloggy/assets/81310484/968b5271-f4e8-43c7-8b6b-6676847e3eee)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/83544985-da53-4caf-9e5e-83eb2f03ec7c)
+
 ### 仪表盘
-![image](https://github.com/relzx766/Bloggy/assets/81310484/b4922dc7-9145-4d9c-aa5f-ef0d20cd9818)
+![image](https://github.com/relzx766/Bloggy/assets/81310484/00562ac2-9587-4585-b0e9-59df475c6c04)
+
+
 
