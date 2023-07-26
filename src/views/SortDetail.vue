@@ -1,8 +1,5 @@
 <template>
   <el-container>
-    <el-header>
-      <navigation/>
-    </el-header>
     <el-main>
       <el-card class="box-card">
         <div slot="header" class="clearfix">
@@ -154,7 +151,6 @@ export default {
 
 <style scoped>
 .box-card {
-  width: 70%;
   margin-left: auto;
   margin-right: auto;
   margin-top: 1%;

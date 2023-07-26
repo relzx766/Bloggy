@@ -1,8 +1,5 @@
 <template>
   <el-container>
-    <el-header>
-      <navigation :active-index="'0'"/>
-    </el-header>
     <el-main style="width: 70%;margin: 0 auto;">
       <el-tabs v-model="activeName">
         <el-tab-pane label="文章" name="first">
@@ -110,6 +107,9 @@ export default {
       this.keyword = to.query.keyword
       this.chooseSearchType()
     }
+  },
+  mounted() {
+    this.$emit("updateIndex",'search')
   }
 }
 </script>

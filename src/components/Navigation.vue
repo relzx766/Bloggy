@@ -1,10 +1,6 @@
 <template>
-  <div id="nav">
-    <div id="content">
       <el-menu :default-active="activeIndex" active-text-color="#449cfc" class="el-menu-demo"
-               mode="horizontal" style="border-bottom-left-radius: 14px;border-bottom-right-radius: 14px;height: 80px;
-
-"
+               mode="horizontal" style="border-bottom-left-radius: 14px;border-bottom-right-radius: 14px;height: 60px;"
       >
         <el-menu-item><img class="menu-img" src="../static/images/logo.svg"></el-menu-item>
         <el-menu-item style="font-size: 26px;color: #449cfc">Bloggy</el-menu-item>
@@ -18,6 +14,11 @@
         </el-menu-item>
         <el-menu-item index="3" @click="changePage('3')">
           <i class="el-icon-edit"></i>
+        </el-menu-item>
+        <el-menu-item>
+          <el-badge :value="1">
+            <el-button icon="el-icon-message" size="small"></el-button>
+          </el-badge>
         </el-menu-item>
         <el-menu-item v-if="!isLogin" style="color: #449cfc;float: right">
           <router-link to="/login">登录</router-link>
@@ -38,9 +39,6 @@
           </el-menu-item-group>
         </el-submenu>
       </el-menu>
-    </div>
-    <div class="line"></div>
-  </div>
 </template>
 
 <script>
@@ -76,7 +74,7 @@ export default {
       console.log("改变页面", index)
       this.currentIndex = index
       if (index == '1') {
-        this.$router.push("/index")
+        this.$router.push("/home")
       }
       if (index == '2') {
         this.$router.push('/trend')
@@ -112,9 +110,4 @@ export default {
   height: 100%;
 }
 </style>
-<style>
-.el-menu--collapse .el-menu .el-submenu,
-.el-menu--popup {
-  min-width: 100px;
-}
-</style>
+

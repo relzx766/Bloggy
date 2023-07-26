@@ -1,8 +1,5 @@
 <template>
   <el-container>
-    <el-header style="margin-bottom: 20px">
-      <navigation :active-index="'4'"/>
-    </el-header>
     <el-main style="width: 80%;margin: 0 auto">
       <el-card style="height: 150px">
         <el-row style="height: 120px">

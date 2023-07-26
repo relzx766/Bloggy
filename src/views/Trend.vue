@@ -1,81 +1,76 @@
 <template>
   <el-container>
-    <el-header style="position: fixed;top: 0;width: 96%;z-index: 10;margin-left: 20px">
-      <navigation :active-index="'2'"/>
-    </el-header>
-    <div style="margin: 0 auto;width: 70%;min-height: 800px">
-      <div class="advertising-board">
-        <el-carousel height="300px" style="border-radius: 10px">
-          <el-carousel-item v-for="item in advertising" :key="item">
+    <el-main>
+      <div style="margin-left: auto;margin-right: auto;width: 70%;min-height: 800px;">
+        <div class="advertising-board">
+          <el-carousel height="300px" style="border-radius: 10px">
+            <el-carousel-item v-for="item in advertising" :key="item">
+              <div>
+                <el-image
+                    fit="cover"
+                    :src="item.image"
+                    style="width: 100%; height: 300px;border-radius: 10px"
+                    @click="toLink(item.url)"></el-image>
+                <h4 class="ad-title">{{ item.slogan }}</h4>
+              </div>
+            </el-carousel-item>
+          </el-carousel>
+        </div>
+        <el-container>
+          <el-main style="margin-top: 40px;border-radius: 14px">
             <div>
-              <el-image
-                  :fit="'cover'"
-                  :src="item.image"
-                  style="width: 100%; height: 300px;border-radius: 10px"
-                  @click="toLink(item.url)"></el-image>
-              <h4 class="ad-title">{{ item.slogan }}</h4>
+              <el-card>
+                <ul style="text-align: center;display: block">
+                  <li v-for="(tag,index) in Object.keys(trends)" class="article-trend" @click="toDetail(tag)">
+                    <a href="#" style="line-height: 30px">
+                      <el-row>
+                        <el-col :span="1">
+                          <el-tag size="mini">
+                            <i class="el-icon-s-marketing"/>
+                            {{ index + 1 }}
+                          </el-tag>
+                        </el-col>
+                        <el-col :span="21">
+                          {{ tag }}
+                        </el-col>
+                        <el-col :span="2" style="float: right">
+                          <i class="el-icon-s-data"/>
+                          {{ trends[tag] }}
+                        </el-col>
+                      </el-row>
+                    </a>
+                  </li>
+                </ul>
+              </el-card>
             </div>
-          </el-carousel-item>
-        </el-carousel>
+          </el-main>
+        </el-container>
       </div>
-      <el-container>
-        <el-main style="margin-top: 40px;border-radius: 14px">
-          <div>
-            <el-card>
-              <ul style="text-align: center;display: block">
-                <li v-for="(item,index) in trend.article" class="article-trend" @click="toDetail(item.id)">
-                  <a href="#" style="line-height: 30px">
-                    <el-row>
-                      <el-col :span="1">
-                        <el-tag size="mini">{{ index + 1 }}</el-tag>
-                      </el-col>
-                      <el-col :span="21">
-                        {{ item.title }}
-                      </el-col>
-                      <el-col :span="2" style="float: right">
-                        <i class="el-icon-s-marketing"/>
-                        {{ item.trend }}
-                      </el-col>
-                    </el-row>
-                  </a>
-                </li>
-              </ul>
-            </el-card>
-          </div>
-        </el-main>
-      </el-container>
-    </div>
+    </el-main>
   </el-container>
 </template>
 
 <script>
-import {getArticleTrend} from "@/api/Article";
-import {getAd} from "@/api/Common";
+import {getAd, getTrend} from "@/api/Common";
 import Navigation from "@/components/Navigation";
 
 export default {
   name: "Trend",
   data() {
     return {
-      trend: {
-        article: [{
-          id: 0,
-          title: '',
-          views: 0
-        }]
-      },
+      trends: {},
       advertising: []
     }
   },
   methods: {
     getTrend() {
-      getArticleTrend().then((res) => {
-        this.trend.article = res.data.articles
-        console.log(this.trend.article)
+      getTrend().then((res) => {
+        this.trends = res.data.trends
       })
     },
-    toDetail(id) {
-      this.$router.push("/detail?id=" + id);
+    toDetail(tag) {
+      tag = '#' + tag + '#'
+      this.$router.push("/search?keyword=" + encodeURIComponent(tag));
     },
     getAd() {
       getAd().then((res) => {
@@ -95,7 +90,8 @@ export default {
     let that = this;
     that.getTrend()
     this.getAd()
-  }
+  },
+
 }
 </script>
 
@@ -129,9 +125,6 @@ li {
   margin-left: 6px;
 }
 
-.advertising-board {
-  margin-top: 100px;
-}
 
 .el-carousel-item {
   position: relative;

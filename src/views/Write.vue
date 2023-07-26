@@ -1,10 +1,7 @@
 <template>
   <el-container>
-    <el-header style="position: fixed;top: 0;width: 96%;z-index: 10;margin-left: 20px">
-      <navigation :active-index="'3'"/>
-    </el-header>
-    <el-container style="margin-top: 50px">
-      <el-aside style="margin-top: 50px;width: 15%;margin-left: 20px;overflow: visible">
+    <el-container>
+      <el-aside style="width: 15%;margin-left: 20px;overflow: visible">
         <el-tag v-for="tag in tags"
                 :key="tag"
                 :disable-transitions="false"
@@ -196,7 +193,7 @@ export default {
   width: 80%;
   text-align: center;
   background-color: #42b983;
-  margin: 30px auto 0;
+  margin: 0 auto 0;
 }
 
 li {

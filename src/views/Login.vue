@@ -1,6 +1,6 @@
 <template>
 
-  <div id="login" v-title data-title="登录 - Bloggy">
+  <div id="login">
     <!--<video preload="auto" class="me-video-player" autoplay="autoplay" loop="loop">
           <source src="../../static/vedio/sea.mp4" type="video/mp4">
       </video>-->

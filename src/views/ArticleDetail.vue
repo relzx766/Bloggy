@@ -1,117 +1,108 @@
 <template>
   <el-container>
-    <el-header style="position: fixed;top: 0;width: 96%;z-index: 10;margin-left: 20px">
-      <navigation :active-index="'0'"/>
-    </el-header>
-    <el-main style="margin-top: 80px;margin-bottom: 80px">
-      <div id="main">
-        <div id="userInfo">
-          <el-card class="info-card">
-            <el-row>
-              <el-col :span="12">
-                <el-row>
-                  <el-col :span="5">
-                    <el-avatar :size="100" :src="article.userVo.avatar" shape="circle"/>
-                  </el-col>
-                  <el-col :span="14" style="text-align: left">
-                    <el-row><h3>{{ article.userVo.nickname }}</h3></el-row>
-                    <el-row>{{ '@' + article.userVo.username }}</el-row>
-                  </el-col>
-                </el-row>
-              </el-col>
-              <el-col :span="12" style="text-align: right">
-                <el-button style="margin-top: 26px" type="primary" @click="changeRelation">{{
-                    relation
-                  }}
-                </el-button>
+    <el-main style="margin: 80px auto;width: 90%;">
+      <el-row style="display: flex">
+       <div style="width: 76%">
+         <el-card id="main">
+           <el-row><span style="font-size: 24px;font-weight: bold">{{article.title}}</span></el-row>
+           <el-row style="margin-top: 4%;margin-bottom: 4%">
+             <el-breadcrumb separator="|">
+               <el-breadcrumb-item class="text-item" style="font-weight: bolder">{{ article.userVo.nickname }}</el-breadcrumb-item>
+               <el-breadcrumb-item class="text-item">
+               {{article.views}}阅读
+               </el-breadcrumb-item>
+               <el-breadcrumb-item class="text-item">
+                 {{article.likeNum}}点赞
+               </el-breadcrumb-item>
+             </el-breadcrumb>
+           </el-row>
+           <div id="content">
+             <mavon-editor
+                 ref="md"
+                 v-model="article.content"
+                 :editable="false"
+                 :subfield="false"
+                 :toolbarsFlag="false"
+                 defaultOpen="preview"
+                 style="z-index: 5;border: none"
+             ></mavon-editor>
+           </div>
+         </el-card>
+         <div id="tag">
+           <el-card>
+             <div slot="header" class="clearfix">
+               <el-row>
+                 <el-col :span="8" style="margin-top: 10px"><span>最后编辑于:{{ time }}</span></el-col>
+                 <el-col :span="16" style="text-align: right;">
+                   <el-button circle @click="like">
+                     <i :class="{'el-icon-like':!article.isLike,'el-icon-liked':article.isLike}"></i>
+                   </el-button>
+                   <span>{{ article.likeNum }}</span>
+                   <el-button circle>
+                     <i class="el-icon-comment"></i>
 
-              </el-col>
-            </el-row>
-
-          </el-card>
-        </div>
-        <div id="title" style="margin-bottom: 8px;text-align: center">
-          <h1 style="font-size: 28px">{{ article.title }}</h1>
-        </div>
-        <div id="article-info"
-             style="font-size: 10px;font-weight: lighter;height: 14px;margin-top: 6px;text-align: center">
-          <span>{{ article.views }}阅读</span>
-          <span>{{ article.comments }}评论</span>
-          <span>{{ article.likeNum }}喜欢</span>
-          <span>{{ new Date(article.createTime).toLocaleString() }}</span>
-        </div>
-        <div id="content">
-          <mavon-editor
-              ref="md"
-              v-model="article.content"
-              :editable="false"
-              :subfield="false"
-              :toolbarsFlag="false"
-              defaultOpen="preview"
-              style="z-index: 5"
-          ></mavon-editor>
-        </div>
-      </div>
-      <div id="tag">
-        <el-card class="box-card">
-          <div slot="header" class="clearfix">
-            <el-row>
-              <el-col :span="8" style="margin-top: 10px"><span>最后编辑于:{{ time }}</span></el-col>
-              <el-col :span="16" style="text-align: right;">
-                <el-button circle @click="like">
-                  <i :class="{'el-icon-like':!article.isLike,'el-icon-liked':article.isLike}"></i>
-                </el-button>
-                <span>{{ article.likeNum }}</span>
-                <el-button circle>
-                  <i class="el-icon-comment"></i>
-
-                </el-button>
-                <span>{{ article.comments }}</span>
-                <el-button circle @click="chooseSortAction">
-                  <i :class="{'el-icon-sort':!article.isSort,'el-icon-sorted':article.isSort}" class="el-icon-sort"></i>
-                </el-button>
-              </el-col>
-            </el-row>
-            <el-dialog
-                :visible.sync="dialogVisible"
-                title="收藏"
-                width="20%"
-            >
-              <div>
-                <el-container>
-                  <el-main>
-                    <el-radio-group v-model="choose">
-                      <el-row v-for="item in sorts" style="margin-top: 8px">
-                        <el-radio :label="item.id">{{ item.title }}</el-radio>
-                      </el-row>
-                    </el-radio-group>
-                  </el-main>
-                  <el-footer>
-                    <el-input v-model="sortTitle" maxlength="15" placeholder="新建收藏夹">
-                      <el-button slot="append" icon="el-icon-circle-plus" @click="createSort"></el-button>
-                    </el-input>
-                  </el-footer>
-                </el-container>
-              </div>
-              <span slot="footer" class="dialog-footer">
+                   </el-button>
+                   <span>{{ article.comments }}</span>
+                   <el-button circle @click="chooseSortAction">
+                     <i :class="{'el-icon-sort':!article.isSort,'el-icon-sorted':article.isSort}" class="el-icon-sort"></i>
+                   </el-button>
+                 </el-col>
+               </el-row>
+               <el-dialog
+                   :visible.sync="dialogVisible"
+                   title="收藏"
+                   width="20%"
+               >
+                 <div>
+                   <el-container>
+                     <el-main>
+                       <el-radio-group v-model="choose">
+                         <el-row v-for="item in sorts" style="margin-top: 8px">
+                           <el-radio :label="item.id">{{ item.title }}</el-radio>
+                         </el-row>
+                       </el-radio-group>
+                     </el-main>
+                     <el-footer>
+                       <el-input v-model="sortTitle" maxlength="15" placeholder="新建收藏夹">
+                         <el-button slot="append" icon="el-icon-circle-plus" @click="createSort"></el-button>
+                       </el-input>
+                     </el-footer>
+                   </el-container>
+                 </div>
+                 <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="appendArticleToSort">确 定</el-button>
   </span>
-            </el-dialog>
+               </el-dialog>
+             </div>
+
+             <el-link v-for="tag in article.tags" @click.native="searchByTag(tag)">
+               <el-tag>{{ tag }}
+               </el-tag>
+             </el-link>
+           </el-card>
+         </div>
+         <el-card class="box-card" style="margin: 0 auto;">
+           <div slot="header" class="clearfix" style="height: 30px" @click="changeType">
+             <span style="float: left;font-weight: bolder;font-size: 20px">评论</span>
+           </div>
+           <comment :id="article.id" :author="article.userVo.id" :type="type"/>
+         </el-card>
+       </div>
+          <div style="width: 22%;margin-left: 2%">
+            <el-card >
+              <author-introduce :author="article.userVo"/>
+              <el-divider/>
+              <h3>相关阅读</h3>
+              <related-read :tags="article.tags" :size="5"/>
+            </el-card>
           </div>
 
-          <el-link v-for="tag in article.tags" @click.native="searchByTag(tag)">
-            <el-tag>{{ tag }}
-            </el-tag>
-          </el-link>
-        </el-card>
-      </div>
-      <el-card class="box-card" style="width: 80%;margin: 0 auto;">
-        <div slot="header" class="clearfix" style="height: 30px" @click="changeType">
-          <span style="float: left;font-weight: bolder;font-size: 20px">评论</span>
-        </div>
-        <comment :id="article.id" :author="article.userVo.id" :type="type"/>
-      </el-card>
+
+
+
+      </el-row>
+
     </el-main>
 
   </el-container>
@@ -125,6 +116,8 @@ import Unfold from "@/components/Unfold";
 import {getCount, getDate} from "@/util/tools";
 import Comment from "@/components/Comment";
 import {append, cancelSort, createSort, getByUser} from "@/api/Sort";
+import AuthorIntroduce from "@/components/AuthorIntroduce.vue";
+import RelatedRead from "@/components/RelatedRead.vue";
 
 export default {
   name: "ArticleDetail",
@@ -260,7 +253,9 @@ export default {
   components: {
     'navigation': Navigation,
     'unfold': Unfold,
-    'comment': Comment
+    'comment': Comment,
+    'author-introduce':AuthorIntroduce,
+    'related-read':RelatedRead
   },
   beforeMount() {
     let id = this.$route.query.id
@@ -300,17 +295,10 @@ span + span {
   margin-top: 20px;
 }
 
-#main {
-  width: 80%;
-  margin: 0 auto;
-}
-
 #tag {
-  width: 80%;
-  margin: 0 auto;
   padding-top: 10px;
   text-align: left;
-  margin-bottom: 20px;
+  margin: 0 auto 20px;
 }
 
 .comments {
@@ -318,7 +306,7 @@ span + span {
 }
 
 ::v-deep .el-icon-view {
-  background: url('../static/images/view.svg') center no-repeat;
+  background: url('@/static/images/view.svg') center no-repeat;
   font-size: 20px;
   background-size: cover;
 }
@@ -330,7 +318,7 @@ span + span {
 }
 
 ::v-deep .el-icon-like {
-  background: url('../static/images/like.svg') center no-repeat;
+  background: url('@/static/images/like.svg') center no-repeat;
   font-size: 20px;
   background-size: cover;
 }
@@ -342,7 +330,7 @@ span + span {
 }
 
 ::v-deep .el-icon-liked {
-  background: url('../static/images/like_fill.svg') center no-repeat;
+  background: url('@/static/images/like_fill.svg') center no-repeat;
   font-size: 20px;
   background-size: cover;
 }
@@ -354,7 +342,7 @@ span + span {
 }
 
 ::v-deep .el-icon-comment {
-  background: url('../static/images/interactive.svg') center no-repeat;
+  background: url('@/static/images/interactive.svg') center no-repeat;
   font-size: 20px;
   background-size: cover;
 }
@@ -366,7 +354,7 @@ span + span {
 }
 
 ::v-deep .el-icon-sort {
-  background: url('../static/images/document.svg') center no-repeat;
+  background: url('@/static/images/document.svg') center no-repeat;
   font-size: 20px;
   background-size: cover;
 }
@@ -378,7 +366,7 @@ span + span {
 }
 
 ::v-deep .el-icon-sorted {
-  background: url('../static/images/document_fill.svg') center no-repeat;
+  background: url('@/static/images/document_fill.svg') center no-repeat;
   font-size: 20px;
   background-size: cover;
 }

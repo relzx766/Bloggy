@@ -17,8 +17,8 @@
           </el-breadcrumb>
         </el-col>
       </el-row>
-      <el-row>
-        <h3 style="text-align: left">{{ item.title }}</h3>
+      <el-row style="width: 100%;text-align: left;display: flex">
+        <h3>{{ item.title }}</h3>
       </el-row>
       <el-row style="text-align: left">
         {{ item.description }}

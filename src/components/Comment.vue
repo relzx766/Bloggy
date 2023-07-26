@@ -9,16 +9,16 @@
                 :src="avatar"
                 style="width: 66px; height: 66px;border-radius: 50%"></el-image>
           </el-col>
-          <el-col :span="17">
+          <el-col :span="16">
             <el-input
                 v-model="comment.content"
                 :autosize="{ minRows: 2}"
                 :placeholder="comment.tempContent"
-                style="width: 700px;float: left;margin-top: 6px"
+                style="width: 100%;float: left;margin-top: 6px"
                 type="textarea">
             </el-input>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="6" style="text-align: center">
             <el-button round style="height: 50px;margin-top: 6px" type="primary" @click="postComment">发布</el-button>
           </el-col>
         </el-row>
@@ -61,9 +61,8 @@
             </el-col>
           </el-row>
           <el-row>
-            <div v-for="(i,k) in getReplyByPage(replyPage,5,item.reply)" class="reply">
-              <div style="width: 90%">
-
+            <div v-for="(i,k) in getReplyByPage(replyPage,5,item.reply)"  class="reply">
+              <div style="width: 90%;">
                 <el-divider></el-divider>
               </div>
               <el-row>

@@ -85,9 +85,8 @@ service.interceptors.response.use(
         // 否则的话抛出错误
         if (response.status === 200) {
             if (response.data.code === 2011) {
-                window.location.href="localhost:8081/login";
-            }
-            else {
+                window.location="http://localhost:8081/login";
+            }else {
                 return Promise.resolve(response);
             }
         } else {

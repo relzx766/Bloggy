@@ -23,7 +23,7 @@
               <el-image :src="require('../../static/images/request.svg')" style="width: 40px;"></el-image>
             </el-col>
             <el-col :span="14" class="count-trend-right">
-              <span>单独用户访问</span><br>
+              <span>唯一用户访问</span><br>
               <span>{{ monthUvCount }}</span>
             </el-col>
           </el-row>
@@ -74,7 +74,7 @@
               </el-col>
               <el-col :span="12" class="view-bar-right">
                 <span class="view-title">最近</span>
-                <el-input v-model="articleDayRange" size="mini" style="width: 10%;
+                <el-input v-model="articleDayRange" size="mini" style="width: 20%;
 margin-left: 6px;margin-right: 6px;
 " @change="artRangeChange"/>
                 <span class="view-title">天</span>

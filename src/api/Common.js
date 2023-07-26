@@ -11,3 +11,8 @@ export const getAd = async () => {
         url: '/statistic/ad'
     })
 }
+export const getTrend=async ()=>{
+    return Get({
+        url:'/statistic/trend'
+    })
+}

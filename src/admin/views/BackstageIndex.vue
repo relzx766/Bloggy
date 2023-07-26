@@ -55,10 +55,7 @@ export default {
     }
   },
   created() {
-    let role = this.$cookie.get("role");
-    if (role !== "admin") {
-      this.$router.push("/index")
-    }
+    this.$router.push("/admin/board")
   }
 }
 </script>

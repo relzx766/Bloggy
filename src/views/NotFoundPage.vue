@@ -1,5 +1,7 @@
 <template>
-  <div><h1>404</h1></div>
+  <div id="container">
+    404
+  </div>
 </template>
 
 <script>
@@ -9,5 +11,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>
