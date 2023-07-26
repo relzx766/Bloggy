@@ -24,11 +24,9 @@ public class StatisticController {
     @Autowired
     RedisService redisService;
 
-    @GetMapping("/article")
+    @GetMapping("/trend")
     public Result getTrend() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("articles", articleService.getTrend());
-        return Result.ok(data);
+        return new Result().success().put("trends", redisService.getTrend());
     }
 
     @GetMapping("/ad")

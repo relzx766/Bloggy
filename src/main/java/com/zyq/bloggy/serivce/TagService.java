@@ -21,5 +21,7 @@ public interface TagService {
 
     Page<Tag> getPage(int offset, int end);
 
+    List<Tag> searchTag(String keyword);
+
     Boolean update(Tag tag);
 }

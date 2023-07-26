@@ -1,5 +1,6 @@
 package com.zyq.bloggy.annotation;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.intellij.lang.annotations.Language;
 
@@ -19,6 +20,7 @@ public @interface Statistics {
     int delta() default 1;
 
     TimeUnit util() default TimeUnit.DAYS;
+
 
     long timeout() default -1;
 

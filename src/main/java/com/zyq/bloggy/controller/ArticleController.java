@@ -9,6 +9,7 @@ import com.zyq.bloggy.model.pojo.Article;
 import com.zyq.bloggy.model.vo.ArticleVo;
 import com.zyq.bloggy.serivce.ArticleService;
 import com.zyq.bloggy.serivce.MailService;
+import com.zyq.bloggy.serivce.RedisService;
 import com.zyq.bloggy.serivce.SortService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class ArticleController {
     MailService mailService;
     @Autowired
     SortService sortService;
+    @Autowired
+    RedisService redisService;
 
 
     @PostMapping("/publish")
@@ -86,6 +89,7 @@ public class ArticleController {
     @SaIgnore
     public Result getByTag(@RequestParam("tags") String[] tag,
                            @RequestParam("page") Integer page) {
+        redisService.incrementTrend(tag);
         return Result.ok(articleService.searchByTag(tag, page));
     }
 

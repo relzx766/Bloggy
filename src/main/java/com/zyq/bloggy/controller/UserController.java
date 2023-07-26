@@ -27,6 +27,7 @@ public class UserController {
     @Autowired
     MailService mailService;
 
+
     @PostMapping("/register")
     public Result register(@RequestBody User user) {
         userService.regBeforeVerify(user);
@@ -137,4 +138,5 @@ public class UserController {
     public Result getCountByDay(@PathVariable("num") Integer num) {
         return new Result().success().put("records", userService.getUserCountByDay(num));
     }
+
 }

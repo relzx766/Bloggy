@@ -36,5 +36,11 @@ public interface RedisService {
 
     Object getUniqueView();
 
+    void incrementTrend(String content);
+
+    void incrementTrend(String[] content);
+
+    Map<String, Integer> getTrend();
+
 
 }

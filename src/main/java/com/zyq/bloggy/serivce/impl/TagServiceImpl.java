@@ -61,6 +61,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public List<Tag> searchTag(String keyword) {
+        return tagMapper.selectList(new LambdaQueryWrapper<Tag>().like(Tag::getContent, keyword));
+    }
+
+    @Override
     public Boolean update(Tag tag) {
         return tagMapper.updateById(tag) > 0;
     }

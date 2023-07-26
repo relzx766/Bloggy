@@ -160,6 +160,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Map<String, Object> searchByTag(String[] tags, int page) {
+
         page = page < 1 ? 1 : page;
         int size = 15;
         int current = (page - 1) * size;

@@ -1,17 +1,16 @@
 package com.zyq.bloggy.serivce.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.zyq.bloggy.model.entity.Status;
-import com.zyq.bloggy.util.TimeUtil;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.ParseException;
 
 public class d {
-    public static void main(String[] args) {
-        System.out.println(TimeUtil.getTimestampOfYearStart(2023));
+    public static void main(String[] args) throws ParseException {
+
     }
 
     void generate() {

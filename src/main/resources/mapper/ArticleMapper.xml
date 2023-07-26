@@ -46,7 +46,7 @@
         from
         (select temp.fromId,temp.toId,temp.create_time
         from(
-        <foreach collection="thumbs" item="item" separator="union">
+        <foreach collection="thumbs" item="item" separator="union all">
             select #{item.fromId} as fromId,#{item.toId} as toId,#{item.createTime} as create_time
         </foreach>
         )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_article as ta on
@@ -99,7 +99,7 @@
     <delete id="delLike">
         delete from tb_like_article where article_id in (
         select temp.article_id from(
-        <foreach collection="thumbs" item="item" separator="union">
+        <foreach collection="thumbs" item="item" separator="union all ">
             select article_id from tb_like_article where article_id=#{item.toId} and user_id=#{item.fromId}
         </foreach>)temp
         )

@@ -21,4 +21,5 @@ public interface UserMapper extends BaseMapper<User> {
 
     @MapKey("date")
     List<Map<String, Integer>> getCountByTime(Timestamp time);
+
 }

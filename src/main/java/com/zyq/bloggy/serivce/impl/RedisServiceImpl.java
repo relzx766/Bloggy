@@ -13,6 +13,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -195,6 +197,39 @@ public class RedisServiceImpl implements RedisService {
             uv.put(k, Math.toIntExact(operations.size(key)));
         }));
         return groupPvOrUv(uv);
+    }
+
+    @Override
+    @Async
+    public void incrementTrend(String content) {
+        BoundHashOperations<String, String, Integer> operations = redisTemplate.boundHashOps("trend");
+        operations.increment(content, 1);
+    }
+
+    @Override
+    @Async
+    public void incrementTrend(String[] content) {
+        BoundHashOperations<String, String, Integer> operations = redisTemplate.boundHashOps("trend");
+        for (int i = 0; i < content.length; i++) {
+            operations.increment(content[i], 1);
+        }
+    }
+
+    @Override
+    public Map<String, Integer> getTrend() {
+        BoundHashOperations<String, String, Integer> operations = redisTemplate.boundHashOps("trend");
+        Map<String, Integer> trends = new HashMap<>();
+        return operations.keys().stream().map(key -> Map.entry(key, operations.get(key)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldVal, newVal) -> oldVal,
+                        LinkedHashMap::new
+                ));
     }
 
     /**

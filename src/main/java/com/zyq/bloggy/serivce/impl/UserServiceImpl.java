@@ -103,6 +103,7 @@ public class UserServiceImpl implements UserService {
         return userMapper.getCountByTime(TimeUtil.getTimestampRange(num));
     }
 
+
     @Override
     @CacheEvict(cacheNames = "reg", key = "#email")
     public Boolean register(String email) {

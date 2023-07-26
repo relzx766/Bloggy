@@ -31,7 +31,7 @@
         <!--        insert into tb_article_comment_like(user_id, comment_id, create_time)
                 select temp.fromId, temp.toId, temp.createTime
                 from (
-                <foreach collection="thumbs" item="item" separator="union">
+                <foreach collection="thumbs" item="item" separator="union all">
                     select #{item.fromId},#{item.toId},#{item.createTime}
                     where exists(select id from tb_user where id=#{item.fromId})
                     and exists(select article_comment_id from tb_article_comment where article_comment_id=#{item.toId})
@@ -45,7 +45,7 @@
         from
         (select temp.fromId,temp.toId,temp.create_time
         from(
-        <foreach collection="thumbs" item="item" separator="union">
+        <foreach collection="thumbs" item="item" separator="union all">
             select #{item.fromId} as fromId,#{item.toId} as toId,#{item.createTime} as create_time
         </foreach>
         )as temp left join tb_user as tu on tu.id=temp.fromId left join tb_article_comment as tac on
@@ -83,7 +83,7 @@
     <delete id="delLike">
         delete from tb_article_comment_like where comment_id in (
         select temp.comment_id from(
-        <foreach collection="thumbs" item="item" separator="union">
+        <foreach collection="thumbs" item="item" separator="union all">
             select comment_id from tb_article_comment_like where comment_id=#{item.toId} and user_id=#{item.fromId}
         </foreach>)temp
         )

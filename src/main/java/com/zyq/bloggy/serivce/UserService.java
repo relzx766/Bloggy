@@ -46,4 +46,5 @@ public interface UserService {
     int getActiveUserCount();
 
     List<Map<String, Integer>> getUserCountByDay(Integer num);
+
 }
